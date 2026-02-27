@@ -1,0 +1,7 @@
+^LICENSE\.md$
+^README\.Rmd$
+^CODE_OF_CONDUCT\.md$
+^doc$
+^Meta$
+^Dockerfile$
+^\.dockerignore$

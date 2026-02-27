@@ -1,0 +1,133 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Caulobrowser <img src="inst/app/www/favicon.ico" align="right" height="50"/>
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+**CauloBrowser** is an interactive Shiny application for browsing and
+visualizing curated high-throughput experimental data for *Caulobacter
+crescentus*. It reimplements and extends the original
+[CauloBrowser](https://doi.org/10.1093/nar/gkv1050) web resource using
+modern R tooling.
+
+## Features
+
+| Feature | CauloBrowser Section | Status |
+|---|---|---|
+| Gene search (name, locus tag, region) | Start page | ✅ |
+| Gene overview table with external links | Figure 1 | ✅ |
+| Time-resolved expression profiles | Figure 2, Sections 2 & 4 | ✅ |
+| Protein localization schematics | Figure 2, Section 3 | ✅ |
+| Genome browser (multi-track viewer) | Figure 3 | 🔜 Planned |
+| Data download (CSV) | Download page | 🔜 Planned |
+
+## Technology Stack
+
+- **Framework**: [golem](https://thinkr-open.github.io/golem/) (production-grade Shiny)
+- **Database**: [DuckDB](https://duckdb.org/) (embedded analytical database)
+- **Visualization**: [plotly](https://plotly.com/r/) (interactive charts), custom SVG (cell schematics)
+- **Tables**: [reactable](https://glin.github.io/reactable/) (interactive tables with HTML support)
+- **UI**: [bslib](https://rstudio.github.io/bslib/) (Bootstrap 5 theming)
+
+## Installation
+
+```r
+# Install dependencies
+remotes::install_github("baldikacti/caulobrowser")
+```
+
+## Quick Start
+
+### 1. Generate a demo database
+
+```r
+caulobrowser::generate_database(path = ".")
+```
+
+This creates `inst/extdata/caulobrowser.duckdb` with demo data for 5
+genes (ctrA, ftsZ, popZ, dnaA, ccrM) including expression time-courses,
+fitness scores, and protein localization.
+
+### 2. Run the app
+
+```r
+caulobrowser::run_app()
+# Or during development:
+golem::run_dev()
+```
+
+### 3. Try searching for: `ctrA, ftsZ, popZ`
+
+## Project Structure
+
+```
+caulobrowser/
+├── DESCRIPTION              # Package metadata & dependencies
+├── NAMESPACE
+├── R/
+│   ├── app_config.R         # golem config access
+│   ├── app_server.R         # Main server function
+│   ├── app_ui.R             # Main UI function (bslib page_navbar)
+│   ├── run_app.R            # Entry point
+│   ├── fct_database.R       # DuckDB connection & query functions
+│   ├── fct_plots.R          # Plotting helpers (plotly, SVG schematics)
+│   ├── mod_gene_search.R    # Module: gene search bar
+│   ├── mod_overview_table.R # Module: Figure 1 overview table
+│   └── mod_expression.R     # Module: Figure 2 expression & localization
+├── data-raw/
+│   └── seed_database.R      # Script to create & populate DuckDB
+├── dev/
+│   ├── 01_start.R           # Initial project setup
+│   ├── 02_dev.R             # Development workflow
+│   ├── 03_deploy.R          # Deployment helpers
+│   └── run_dev.R            # Quick launch
+├── inst/
+│   ├── app/www/             # Static assets (CSS, favicon)
+│   ├── extdata/             # DuckDB database file
+│   └── golem-config.yml     # App configuration
+├── tests/
+│   └── testthat/            # Unit tests
+└── app.R                    # Deployment entry point
+```
+
+## Loading Real Data
+
+Replace the demo `INSERT` statements in `data-raw/seed_database.R` with
+your actual data loading pipeline. The database schema supports:
+
+- **genes**: Annotation, coordinates, external IDs
+- **expression_timecourse**: Time-resolved expression from any platform
+- **fitness**: Tn-seq essentiality scores
+- **protein_localization**: Subcellular localization across cell cycle stages
+
+You can load data from CSV/TSV files using DuckDB's `COPY` or `read_csv_auto()`.
+
+## References
+
+Lasker, K., Schrader, J.M., Men, Y., Marshik, T., Dill, D.L., McAdams,
+H.H., & Shapiro, L. (2016). CauloBrowser: A systems biology resource
+for *Caulobacter crescentus*. *Nucleic Acids Research, 44*(D1),
+D640–D645. <https://doi.org/10.1093/nar/gkv1050>
+
+## License
+
+MIT
+
+## Code of Conduct
+
+Please note that the caulobrowser project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

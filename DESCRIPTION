@@ -1,0 +1,33 @@
+Package: caulobrowser
+Title: CauloBrowser: A Systems Biology Resource for Caulobacter Crescentus
+Version: 0.1.0
+Authors@R: 
+    person("Berent", "Aldikacti", , "aldikactiberent@gmail.com", role = c("aut", "cre"))
+Description: An interactive Shiny application for browsing and visualizing
+    curated high-throughput experimental data for Caulobacter crescentus.
+    Built with the golem framework.
+License: MIT + file LICENSE
+Imports: 
+    bslib (>= 0.6.0),
+    config (>= 0.3.2),
+    DBI,
+    duckdb,
+    ggplot2,
+    glue,
+    golem,
+    htmltools,
+    plotly,
+    reactable,
+    shiny
+Suggests: 
+    knitr,
+    rmarkdown,
+    spelling,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-US
+LazyData: true
+RoxygenNote: 7.3.3
