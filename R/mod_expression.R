@@ -15,7 +15,6 @@ mod_expression_ui <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::tagList(
-    shiny::h3("Section 2: Time-Resolved Expression"),
     shiny::p(
       class = "text-muted",
       "Expression levels across the Caulobacter cell cycle from multiple",

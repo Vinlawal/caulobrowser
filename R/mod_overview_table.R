@@ -13,7 +13,6 @@ mod_overview_table_ui <- function(id) {
   ns <- shiny::NS(id)
 
   shiny::tagList(
-    shiny::h3("Section 1: Gene Overview"),
     shiny::uiOutput(ns("overview_table_ui"))
   )
 }

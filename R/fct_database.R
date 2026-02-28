@@ -223,6 +223,70 @@ get_de_results <- function(con, gene_ids) {
 }
 
 
+#' Get distinct data_type values for DE comparison experiments
+#'
+#' Used to populate the filter dropdown in the DE heatmap module.
+#'
+#' @param con DBI connection
+#' @return Character vector of distinct `data_type` values, ordered alphabetically.
+#' @noRd
+get_de_data_types <- function(con) {
+  DBI::dbGetQuery(
+    con,
+    "SELECT DISTINCT data_type
+     FROM experiments
+     WHERE experiment_class = 'de_comparison'
+       AND data_type IS NOT NULL
+     ORDER BY data_type"
+  )$data_type
+}
+
+
+#' Get DE results for the heatmap, with optional data_type filter
+#'
+#' @param con DBI connection
+#' @param gene_ids Character vector of gene IDs (CCNA_XXXXX).
+#' @param data_type Optional character scalar to filter `experiments.data_type`.
+#'   Pass NULL to include all types.
+#' @return A data.frame with columns: `gene_id`, `gene_name`, `cc_tag`,
+#'   `experiment_id`, `display_label`, `data_type`, `log2fc`, `padj`.
+#' @noRd
+get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
+  gene_placeholders <- paste(rep("?", length(gene_ids)), collapse = ", ")
+
+  base_sql <- glue::glue(
+    "SELECT
+       dr.gene_id,
+       g.gene_name,
+       g.cc_tag,
+       dr.experiment_id,
+       exp.display_label,
+       exp.data_type,
+       dr.log2fc,
+       dr.padj
+     FROM de_results dr
+     JOIN genes g         ON dr.gene_id       = g.gene_id
+     JOIN experiments exp ON dr.experiment_id = exp.experiment_id
+     WHERE dr.gene_id IN ({gene_placeholders})
+       AND exp.experiment_class = 'de_comparison'"
+  )
+
+  if (!is.null(data_type) && length(data_type) > 0) {
+    type_placeholders <- paste(rep("?", length(data_type)), collapse = ", ")
+    sql    <- paste0(base_sql,
+                     glue::glue("\n       AND exp.data_type IN ({type_placeholders})"),
+                     "\n     ORDER BY exp.data_type, exp.display_label, g.gene_name")
+    params <- c(gene_ids, data_type)
+  } else {
+    sql    <- paste0(base_sql,
+                     "\n     ORDER BY exp.data_type, exp.display_label, g.gene_name")
+    params <- gene_ids
+  }
+
+  DBI::dbGetQuery(con, sql, params = params)
+}
+
+
 # ── Stubs future additions ──────────────────────────────────────────────────
 # fitness and protein_localization are not in the current schema.
 # These stubs keep existing UI code from crashing; callers already handle

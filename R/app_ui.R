@@ -75,6 +75,19 @@ app_ui <- function(request) {
               bslib::card_body(
                 mod_expression_ui("expression")
               )
+            ),
+
+            shiny::br(),
+
+            # Section 3: Differential Expression Heatmap
+            bslib::card(
+              bslib::card_header(
+                class = "bg-primary text-white",
+                "Differential Expression"
+              ),
+              bslib::card_body(
+                mod_de_heatmap_ui("de_heatmap")
+              )
             )
           )
         )

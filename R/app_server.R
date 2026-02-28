@@ -59,4 +59,8 @@ app_server <- function(input, output, session) {
 
   # ── Module: Expression Profiles (Figure 2) ───────────────────
   mod_expression_server("expression", gene_results, db_con)
+
+
+  # ── Module: Differential Expression Heatmap (Section 3) ──────
+  mod_de_heatmap_server("de_heatmap", gene_results, db_con)
 }
