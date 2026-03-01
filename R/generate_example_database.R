@@ -1,35 +1,43 @@
 #' Generate an example CauloBrowser database
 #'
-#' Creates a DuckDB database file pre-populated with demo data for five
+#' Creates a DuckDB database pre-populated with demo data for five
 #' *Caulobacter crescentus* NA1000 genes across two experiments: a
 #' cell-cycle RNA-seq timecourse and a CtrA-depletion DE comparison.
 #'
-#' @param path Path where the `.duckdb` file should be written.
-#'   Defaults to `"caulobrowser_example.duckdb"` in the current working
-#'   directory.
+#' @param path Path where the `.duckdb` file should be written, or `":memory:"`
+#'   to create a transient in-memory database.  Defaults to
+#'   `"caulobrowser_example.duckdb"` in the current working directory.
 #' @param overwrite Logical. If `TRUE` (default) an existing file at
-#'   `path` is removed before creating the new database.
+#'   `path` is removed before creating the new database. Ignored when
+#'   `path = ":memory:"`.
 #'
-#' @return The resolved `path`, invisibly.
+#' @return When `path = ":memory:"`, the open `DBI` connection (caller is
+#'   responsible for closing it).  Otherwise the resolved `path`, invisibly.
 #' @export
 generate_example_database <- function(
   path = "caulobrowser_example.duckdb",
   overwrite = TRUE
 ) {
-  path <- normalizePath(path, mustWork = FALSE)
+  in_memory <- identical(path, ":memory:")
 
-  if (file.exists(path) && !overwrite) {
-    stop(
-      "File already exists: ",
-      path,
-      "\n  Use overwrite = TRUE to replace it.",
-      call. = FALSE
-    )
-    file.remove(path)
+  if (!in_memory) {
+    path <- normalizePath(path, mustWork = FALSE)
+
+    if (file.exists(path) && !overwrite) {
+      stop(
+        "File already exists: ",
+        path,
+        "\n  Use overwrite = TRUE to replace it.",
+        call. = FALSE
+      )
+      file.remove(path)
+    }
   }
 
   con <- DBI::dbConnect(duckdb::duckdb(), dbdir = path)
-  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  if (!in_memory) {
+    on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
+  }
 
   # ── Schema ──────────────────────────────────────────────────────────────────
   DBI::dbExecute(
@@ -144,7 +152,7 @@ CREATE TABLE timecourse_expression (
     con,
     "genes",
     data.frame(
-      gene_id. = c(
+      gene_id = c(
         "CCNA_00090",
         "CCNA_00446",
         "CCNA_02647",
@@ -185,7 +193,7 @@ CREATE TABLE timecourse_expression (
       experiment_class = c("timecourse", "de_comparison"),
       data_type = c("rnaseq", "rnaseq"),
       strain = c("NA1000", "NA1000"),
-      genetic_background = c("wildtype", "ctrA::pMT335"),
+      genetic_background = c("wildtype", "ctrA knockout"),
       treatment = c(NA_character_, "vanillate depletion"),
       treatment_level = c(NA_character_, "0 h"),
       growth_phase = c("synchronised swarmer", "exponential"),
@@ -262,6 +270,10 @@ CREATE TABLE timecourse_expression (
     })
   )
   DBI::dbAppendTable(con, "timecourse_expression", tc_expr)
+
+  if (in_memory) {
+    return(invisible(con))
+  }
 
   message("Example database written to: ", path)
   invisible(path)
