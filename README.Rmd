@@ -58,6 +58,10 @@ differential expression results.
 ### 2. Run the app
 
 ```r
+# Set the `CAULOBROWSER_DB_PATH` to where your database is
+Sys.setenv(
+  "CAULOBROWSER_DB_PATH" = "/path/to/caulobrowser.duckdb"
+)
 caulobrowser::run_app()
 # Or during development:
 golem::run_dev()
@@ -102,16 +106,10 @@ caulobrowser/
 The app reads from a DuckDB database with five tables:
 
 - **`genes`** — `gene_id` (CCNA_XXXXX NA1000 locus tag), `cc_tag` (CC_XXXX CB15 legacy tag), `gene_name`, `ncbi_protein_id`, `gene_biotype`, `description`
-- **`experiments`** — metadata for each dataset: `experiment_id`, `display_label`, `experiment_class` (`de_comparison` | `timecourse` | `chipseq` | `proteomics` | `tnseq` | `other`), `data_type`, `strain`, `lab_group`, `doi`, and axis/value labels
+- **`experiments`** — metadata for each dataset: `experiment_id`, `display_label`, `experiment_class` (`de_comparison` | `timecourse`), `data_type`, `strain`, `lab_group`, `doi`
 - **`experiment_conditions`** — ordered condition labels with optional numeric values and units; FK → `experiments`
 - **`de_results`** — `log2fc` and `padj` per gene per experiment; FK → `genes` + `experiments`
 - **`timecourse_expression`** — `expression_value` per gene per condition per experiment; FK → `genes`, `experiments`, and `experiment_conditions`
-
-## Loading Real Data
-
-Replace the demo `INSERT` statements in `data-raw/seed_database.R` with
-your actual data loading pipeline. You can load data from CSV/TSV files
-using DuckDB's `COPY` or `read_csv_auto()`.
 
 ## References
 

@@ -1,26 +1,9 @@
-FROM rocker/verse:4.5.2
-RUN apt-get update && apt-get install -y  libcairo2-dev libfontconfig1-dev libfreetype6-dev libpng-dev libxml2-dev make pandoc xz-utils zlib1g-dev && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/
-RUN echo "options(repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site
-RUN R -e 'install.packages("remotes")'
-RUN Rscript -e 'remotes::install_version("glue",upgrade="never", version = "1.8.0")'
-RUN Rscript -e 'remotes::install_version("htmltools",upgrade="never", version = "0.5.8.1")'
-RUN Rscript -e 'remotes::install_version("bslib",upgrade="never", version = "0.10.0")'
-RUN Rscript -e 'remotes::install_version("knitr",upgrade="never", version = "1.50")'
-RUN Rscript -e 'remotes::install_version("shiny",upgrade="never", version = "1.12.1")'
-RUN Rscript -e 'remotes::install_version("config",upgrade="never", version = "0.3.2")'
-RUN Rscript -e 'remotes::install_version("ggplot2",upgrade="never", version = "4.0.1")'
-RUN Rscript -e 'remotes::install_version("DBI",upgrade="never", version = "1.2.3")'
-RUN Rscript -e 'remotes::install_version("testthat",upgrade="never", version = "3.3.2")'
-RUN Rscript -e 'remotes::install_version("spelling",upgrade="never", version = "2.3.2")'
-RUN Rscript -e 'remotes::install_version("reactable",upgrade="never", version = "0.4.5")'
-RUN Rscript -e 'remotes::install_version("golem",upgrade="never", version = "0.5.1")'
-RUN Rscript -e 'remotes::install_version("ggiraph",upgrade="never", version = "0.9.6")'
-RUN Rscript -e 'remotes::install_version("duckdb",upgrade="never", version = "1.4.4")'
-RUN mkdir /build_zone
-ADD . /build_zone
-WORKDIR /build_zone
-RUN R -e 'remotes::install_local(upgrade="never")'
-RUN rm -rf /build_zone
+FROM baldikacti/caulobrowser_base:latest
+COPY renv.lock renv.lock
+RUN R -e 'options(renv.config.pak.enabled = FALSE);renv::restore()'
+COPY ./deploy/caulobrowser_*.tar.gz /app.tar.gz
+RUN R -e 'remotes::install_local("/app.tar.gz",upgrade="never")'
+RUN rm /app.tar.gz
 EXPOSE 3838
-CMD  ["R", "-e", "options('shiny.port'=3838,shiny.host='0.0.0.0');library(caulobrowser);caulobrowser::run_app()"]
+ENV CAULOBROWSER_DB_PATH=/database/caulobrowser.duckdb
+CMD ["R", "-e", "options('shiny.port'=3838,shiny.host='0.0.0.0');library(caulobrowser);caulobrowser::run_app()"]
