@@ -20,7 +20,7 @@ mod_de_heatmap_ui <- function(id) {
   shiny::tagList(
     shiny::p(
       class = "text-muted",
-      "Log\u00b2 fold-change values from differential expression comparisons.",
+      "Log\u00b2 fold-change values from comparison experiments.",
       "Blue\u00a0=\u00a0down-regulated, red\u00a0=\u00a0up-regulated relative to the reference.",
       "Use the dropdown to filter by data type."
     ),
@@ -36,7 +36,10 @@ mod_de_heatmap_ui <- function(id) {
         )
       )
     ),
-    ggiraph::girafeOutput(ns("de_heatmap"), height = "auto")
+    shiny::div(
+      style = "max-height: 600px; overflow-y: auto;",
+      ggiraph::girafeOutput(ns("de_heatmap"))
+    )
   )
 }
 
@@ -87,7 +90,7 @@ mod_de_heatmap_server <- function(id, gene_results, db_con) {
       max_experiments <- max(
         tapply(df$display_label, df$data_type, function(x) length(unique(x)))
       )
-      max(200L, max_experiments * 40L + 150L)
+      max(200L, max_experiments * 28L)
     })
 
     # ── Render heatmap ─────────────────────────────────────────────────────
@@ -101,7 +104,7 @@ mod_de_heatmap_server <- function(id, gene_results, db_con) {
             x = 0.5,
             y = 0.5,
             label = paste0(
-              "No differential expression data available\n",
+              "No comparison data available\n",
               "for the selected genes and data type."
             ),
             hjust = 0.5,

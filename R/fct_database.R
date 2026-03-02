@@ -1,10 +1,3 @@
-#' Database Connection and Query Functions
-#'
-#' Functions for connecting to and querying the CauloBrowser DuckDB database.
-#'
-#' @name fct_database
-#' @noRd
-
 #' Get a DuckDB connection
 #'
 #' Returns a DBI connection to the CauloBrowser DuckDB database.
@@ -249,7 +242,7 @@ get_de_data_types <- function(con) {
 #' @param data_type Optional character scalar to filter `experiments.data_type`.
 #'   Pass NULL to include all types.
 #' @return A data.frame with columns: `gene_id`, `gene_name`, `cc_tag`,
-#'   `experiment_id`, `display_label`, `data_type`, `log2fc`, `padj`.
+#'   `experiment_id`, `display_label`, `data_type`, `doi`, `log2fc`, `padj`.
 #' @noRd
 get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
   gene_placeholders <- paste(rep("?", length(gene_ids)), collapse = ", ")
@@ -262,6 +255,7 @@ get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
        dr.experiment_id,
        exp.display_label,
        exp.data_type,
+       exp.doi,
        dr.log2fc,
        dr.padj
      FROM de_results dr
@@ -273,13 +267,17 @@ get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
 
   if (!is.null(data_type) && length(data_type) > 0) {
     type_placeholders <- paste(rep("?", length(data_type)), collapse = ", ")
-    sql    <- paste0(base_sql,
-                     glue::glue("\n       AND exp.data_type IN ({type_placeholders})"),
-                     "\n     ORDER BY exp.data_type, exp.display_label, g.gene_name")
+    sql <- paste0(
+      base_sql,
+      glue::glue("\n       AND exp.data_type IN ({type_placeholders})"),
+      "\n     ORDER BY exp.data_type, exp.display_label, g.gene_name"
+    )
     params <- c(gene_ids, data_type)
   } else {
-    sql    <- paste0(base_sql,
-                     "\n     ORDER BY exp.data_type, exp.display_label, g.gene_name")
+    sql <- paste0(
+      base_sql,
+      "\n     ORDER BY exp.data_type, exp.display_label, g.gene_name"
+    )
     params <- gene_ids
   }
 

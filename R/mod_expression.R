@@ -48,7 +48,7 @@ mod_expression_server <- function(id, gene_results, db_con) {
         "#F781BF",
         "#999999"
       )
-      setNames(colors[seq_along(gene_names)], gene_names)
+      stats::setNames(colors[seq_along(gene_names)], gene_names)
     })
 
     # Populate genetic_background dropdown from DB
@@ -161,12 +161,16 @@ mod_expression_server <- function(id, gene_results, db_con) {
 
           shiny::div(
             style = "margin-bottom: 24px;",
+            ggiraph::girafeOutput(
+              ns(output_id),
+              width = "100%",
+              height = "350px"
+            ),
             shiny::div(
               style = "display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;",
-              shiny::strong(exp_label),
+              shiny::strong("Publication:"),
               doi_link
-            ),
-            ggiraph::girafeOutput(ns(output_id), height = "300px")
+            )
           )
         })
 
@@ -180,7 +184,7 @@ mod_expression_server <- function(id, gene_results, db_con) {
       shiny::tagList(groups)
     })
 
-    # Register renderPlotly for each experiment dynamically
+    # Register renderGirafe for each experiment dynamically
     shiny::observe({
       df <- expression_data()
       shiny::req(df, nrow(df) > 0)

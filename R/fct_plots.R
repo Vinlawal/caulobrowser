@@ -1,10 +1,3 @@
-#' Plotting Helper Functions
-#'
-#' Functions for creating CauloBrowser visualizations.
-#'
-#' @name fct_plots
-#' @noRd
-
 #' Plot time-resolved expression profiles
 #'
 #' Creates a ggiraph line chart showing gene expression across cell cycle
@@ -37,7 +30,7 @@ plot_expression_timecourse <- function(expression_df, color_palette = NULL) {
       "#F781BF",
       "#999999"
     )
-    color_palette <- setNames(
+    color_palette <- stats::setNames(
       default_colors[seq_along(gene_names)],
       gene_names
     )
@@ -89,7 +82,10 @@ plot_expression_timecourse <- function(expression_df, color_palette = NULL) {
 
   ggiraph::girafe(
     ggobj = p,
-    options = list(ggiraph::opts_tooltip(use_fill = TRUE))
+    options = list(
+      ggiraph::opts_tooltip(use_fill = TRUE),
+      ggiraph::opts_sizing(rescale = TRUE, width = 1)
+    )
   )
 }
 
@@ -126,7 +122,7 @@ plot_single_expression <- function(
       "#F781BF",
       "#999999"
     )
-    color_palette <- setNames(
+    color_palette <- stats::setNames(
       default_colors[seq_along(gene_names)],
       gene_names
     )
@@ -170,7 +166,12 @@ plot_single_expression <- function(
 
   ggiraph::girafe(
     ggobj = p,
-    options = list(ggiraph::opts_tooltip(use_fill = TRUE))
+    width_svg = 8,
+    height_svg = 3.5,
+    options = list(
+      ggiraph::opts_tooltip(use_fill = TRUE),
+      ggiraph::opts_sizing(rescale = TRUE, width = 1)
+    )
   )
 }
 
@@ -231,7 +232,7 @@ render_cell_schematic <- function(
         "#F781BF",
         "#999999"
       )
-      color_palette <- setNames(
+      color_palette <- stats::setNames(
         default_colors[seq_along(gene_names)],
         gene_names
       )
@@ -362,6 +363,7 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
       high = "#D6604D",
       midpoint = 0,
       limits = c(-scale_limit, scale_limit),
+      oob = scales::squish,
       name = "log2FC",
       guide = ggplot2::guide_colorbar(
         barwidth = 1,
@@ -370,12 +372,13 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
       )
     ) +
     ggplot2::labs(x = NULL, y = NULL) +
+    ggplot2::scale_x_discrete(position = "top") +
     ggplot2::theme_minimal(base_size = 12) +
     ggplot2::theme(
       axis.text.x = ggplot2::element_text(
         angle = 35,
-        hjust = 1,
-        vjust = 1,
+        hjust = 0,
+        vjust = 0,
         size = 10
       ),
       axis.text.y = ggplot2::element_text(face = "italic", size = 11),
@@ -388,18 +391,21 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
     )
 
   if (do_facet) {
-    p <- p + ggplot2::facet_wrap(
-      ~data_type,
-      scales = "free_y",
-      labeller = ggplot2::labeller(
-        data_type = function(x) tools::toTitleCase(gsub("_", " ", x, fixed = TRUE))
+    p <- p +
+      ggplot2::facet_wrap(
+        ~data_type,
+        scales = "free_y",
+        labeller = ggplot2::labeller(
+          data_type = function(x) {
+            tools::toTitleCase(gsub("_", " ", x, fixed = TRUE))
+          }
+        )
       )
-    )
   }
 
   ggiraph::girafe(
     ggobj = p,
-    height_svg = height_px / 72,
+    height_svg = height_px / 96,
     options = list(
       ggiraph::opts_tooltip(
         use_fill = FALSE,
@@ -408,8 +414,7 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
           "padding:6px 10px;border-radius:4px;",
           "font-size:12px;white-space:pre;"
         )
-      ),
-      ggiraph::opts_hover(css = "stroke:#222222;stroke-width:1.5px;")
+      )
     )
   )
 }

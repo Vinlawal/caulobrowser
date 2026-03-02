@@ -55,7 +55,6 @@ mod_gene_search_ui <- function(id) {
 
 mod_gene_search_server <- function(id, db_con) {
   shiny::moduleServer(id, function(input, output, session) {
-
     # Reactive: matched gene records
     gene_results <- shiny::eventReactive(input$btn_search, {
       shiny::req(nchar(trimws(input$gene_query)) > 0)

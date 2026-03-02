@@ -59,10 +59,7 @@ CREATE TABLE genes (
 CREATE TABLE experiments (
     experiment_id       VARCHAR PRIMARY KEY,
     display_label       VARCHAR NOT NULL,
-    experiment_class    VARCHAR NOT NULL
-        CHECK (experiment_class IN (
-            'de_comparison', 'timecourse', 'chipseq', 'proteomics', 'tnseq', 'other'
-        )),
+    experiment_class    VARCHAR NOT NULL,
     data_type           VARCHAR NOT NULL,
     strain              VARCHAR,
     genetic_background  VARCHAR,
@@ -73,13 +70,12 @@ CREATE TABLE experiments (
     ref_strain          VARCHAR,
     ref_treatment       VARCHAR,
     ref_treatment_level VARCHAR,
+    ref_growth_phase.   VARCHAR,
+    ref_media.          VARCHAR,
     lab_group           VARCHAR,
     doi                 VARCHAR,
     geo_id              VARCHAR,
-    date_added          DATE,
-    x_axis_label        VARCHAR,
-    y_axis_label        VARCHAR,
-    value_label         VARCHAR
+    date_added          DATE
 );"
   )
 
@@ -201,13 +197,12 @@ CREATE TABLE timecourse_expression (
       ref_strain = c(NA_character_, "NA1000"),
       ref_treatment = c(NA_character_, NA_character_),
       ref_treatment_level = c(NA_character_, NA_character_),
+      ref_growth_phase = c(NA_character_, "exponential"),
+      ref_media = c(NA_character_, "M2G"),
       lab_group = c("Laub lab", "Laub lab"),
       doi = c("10.1016/j.cell.2009.01.001", "10.1073/pnas.0407828102"),
       geo_id = c("GSE12345", "GSE67890"),
       date_added = as.Date(c("2024-01-15", "2024-03-20")),
-      x_axis_label = c("Time (min)", NA_character_),
-      y_axis_label = c("Expression (log2 TPM)", "log2 fold change"),
-      value_label = c("log2 TPM", "log2FC"),
       stringsAsFactors = FALSE
     )
   )
