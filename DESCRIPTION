@@ -18,6 +18,7 @@ Imports:
     golem,
     htmltools,
     reactable,
+    scales,
     shiny,
     stats,
     tools

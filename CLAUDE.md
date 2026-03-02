@@ -46,7 +46,7 @@ All data lives in a **DuckDB** embedded database opened in read-only mode per se
 
 - `genes` — `gene_id` (VARCHAR PK, CCNA_XXXXX NA1000 locus tag), `cc_tag` (CC_XXXX CB15 legacy tag), `gene_name`, `ncbi_protein_id`, `gene_biotype`, `description`
 
-- `experiments` — `experiment_id` (VARCHAR PK), `display_label`, `experiment_class` (CHECK: `'de_comparison'|'timecourse'|'chipseq'|'proteomics'|'tnseq'|'other'`), `data_type`, `strain`, `genetic_background`, `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`, `ref_treatment`, `ref_treatment_level`, `lab_group`, `doi`, `geo_id`, `date_added`, `x_axis_label`, `y_axis_label`, `value_label`
+- `experiments` — `experiment_id` (VARCHAR PK), `display_label`, `experiment_class` (CHECK: `'de_comparison'|'timecourse'|'chipseq'|'proteomics'|'tnseq'|'other'`), `data_type`, `strain`, `genetic_background`, `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`, `ref_treatment`, `ref_treatment_level`, `ref_growth_phase`, `ref_media`, `lab_group`, `doi`, `geo_id`, `date_added`
 
 - `experiment_conditions` — (`experiment_id`, `condition_label`) composite PK; `condition_order` (INTEGER), `condition_value` (DOUBLE), `condition_units`, `display_label`. FK → `experiments`
 
@@ -73,7 +73,7 @@ Indexes on: `de_results(experiment_id)`, `de_results(gene_id)`, `timecourse_expr
 ### Plotting
 
 `R/fct_plots.R` contains:
-- `plot_expression_timecourse()` — multi-gene ggplot2 line chart converted to plotly
+- `plot_expression_timecourse()` — multi-gene interactive ggplot2 line chart using ggirafe
 - `plot_single_expression()` — single-experiment variant
 - `render_cell_schematic()` — custom SVG of Caulobacter cell with protein positions
 

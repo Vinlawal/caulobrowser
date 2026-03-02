@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^data-raw$
@@ -20,3 +22,5 @@ rsconnect/
 ^Dockerfile$
 ^\.dockerignore$
 ^\.DS_Store$
+deploy/
+^\./deploy$

@@ -1,8 +1,10 @@
 .RData
 .Rhistory
+.Rprofile
 .git
 .gitignore
 .DS_Store
 manifest.json
 rsconnect/
 .Rproj.user
+deploy/
