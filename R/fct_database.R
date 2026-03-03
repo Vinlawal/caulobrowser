@@ -82,7 +82,7 @@ close_db_connection <- function(con) {
 #' @return A data.frame of matching gene records.
 #' @noRd
 search_genes <- function(con, query) {
-  terms <- trimws(unlist(strsplit(query, "[,;\\s]+")))
+  terms <- trimws(unlist(strsplit(query, "[,;]+")))
   terms <- terms[nchar(terms) > 0]
   terms <- tolower(terms)
 
