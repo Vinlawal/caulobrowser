@@ -414,7 +414,8 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
           "padding:6px 10px;border-radius:4px;",
           "font-size:12px;white-space:pre;"
         )
-      )
+      ),
+      ggiraph::opts_selection(type = "none")
     )
   )
 }
