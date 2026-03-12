@@ -1,7 +1,29 @@
-#' helpers 
+#' Create an HTML table row with a label and value cell
 #'
-#' @description A utils function
+#' @param label Character. Text for the header cell (`<th>`).
+#' @param value The content for the data cell (`<td>`). Can be a string or a
+#'   Shiny tag object.
 #'
-#' @return The return value, if any, from executing the utility.
-#'
+#' @return A `shiny.tag` object representing a `<tr>` element.
 #' @noRd
+make_row <- function(label, value) {
+  shiny::tags$tr(
+    shiny::tags$th(label, style = "white-space: nowrap; font-weight: 600;"),
+    shiny::tags$td(value)
+  )
+}
+
+#' Return a value or a fallback if missing/empty
+#'
+#' Coalesces `NULL`, `NA`, and empty strings to `or` so UI cells
+#' always display something meaningful.
+#'
+#' @param x A scalar value to test.
+#' @param or The fallback value to return when `x` is `NULL`, `NA`, or empty.
+#'   Defaults to `"—"` (em-dash).
+#'
+#' @return `x` if it is non-`NULL`, non-`NA`, and non-empty; otherwise `or`.
+#' @noRd
+na_or <- function(x, or = "\u2014") {
+  if (!is.null(x) && !is.na(x) && nzchar(x)) x else or
+}

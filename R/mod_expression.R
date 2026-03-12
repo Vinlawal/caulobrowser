@@ -103,6 +103,9 @@ mod_expression_server <- function(id, gene_results, db_con) {
         "experiment_id",
         "experiment_type",
         "display_label",
+        "treatment_level",
+        "media",
+        "strain",
         "doi"
       )])
     })
@@ -145,9 +148,12 @@ mod_expression_server <- function(id, gene_results, db_con) {
           exp_id <- exps$experiment_id[i]
           exp_label <- exps$display_label[i]
           doi_val <- exps$doi[i]
+          treatment_val <- exps$treatment_level[i]
+          media_val <- exps$media[i]
+          strain_val <- exps$strain[i]
           output_id <- paste0("plot_", exp_id)
 
-          doi_link <- if (
+          doi_cell <- if (
             !is.null(doi_val) && !is.na(doi_val) && nzchar(doi_val)
           ) {
             shiny::tags$a(
@@ -156,20 +162,39 @@ mod_expression_server <- function(id, gene_results, db_con) {
               doi_val
             )
           } else {
-            NULL
+            shiny::span("\u2014")
           }
 
+          info_panel <- bslib::card(
+            style = "font-size: 0.85em; height: 100%;",
+            bslib::card_header("Experiment details"),
+            bslib::card_body(
+              shiny::tags$table(
+                class = "table table-sm table-borderless mb-0",
+                shiny::tags$tbody(
+                  make_row("Treatment level:", na_or(treatment_val)),
+                  make_row("Media:", na_or(media_val)),
+                  make_row("Strain:", na_or(strain_val)),
+                  make_row("DOI:", doi_cell)
+                )
+              )
+            )
+          )
+
           shiny::div(
-            style = "margin-bottom: 24px;",
-            ggiraph::girafeOutput(
-              ns(output_id),
-              width = "100%",
-              height = "350px"
+            class = "row align-items-start mb-4",
+            shiny::div(
+              class = "col-12 col-lg-8",
+              ggiraph::girafeOutput(
+                ns(output_id),
+                width = "100%",
+                height = "350px"
+              )
             ),
             shiny::div(
-              style = "display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px;",
-              shiny::strong("Publication:"),
-              doi_link
+              class = "col-12 col-lg-4",
+              style = "padding-top: 8px;",
+              info_panel
             )
           )
         })
