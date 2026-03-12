@@ -245,7 +245,9 @@ get_de_data_types <- function(con) {
 #' @param data_type Optional character scalar to filter `experiments.data_type`.
 #'   Pass NULL to include all types.
 #' @return A data.frame with columns: `gene_id`, `gene_name`, `cc_tag`,
-#'   `experiment_id`, `display_label`, `data_type`, `doi`, `log2fc`, `padj`.
+#'   `experiment_id`, `display_label`, `data_type`, `strain`, `treatment`,
+#'   `treatment_level`, `media`, `growth_phase`, `lab_group`, `doi`,
+#'   `log2fc`, `padj`.
 #' @noRd
 get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
   gene_placeholders <- paste(rep("?", length(gene_ids)), collapse = ", ")
@@ -258,7 +260,20 @@ get_de_results_for_heatmap <- function(con, gene_ids, data_type = NULL) {
        dr.experiment_id,
        exp.display_label,
        exp.data_type,
+       exp.strain,
+       exp.genetic_background,
+       exp.treatment,
+       exp.treatment_level,
+       exp.media,
+       exp.growth_phase,
+       exp.ref_strain,
+       exp.ref_treatment,
+       exp.ref_treatment_level,
+       exp.ref_media,
+       exp.ref_growth_phase,
+       exp.lab_group,
        exp.doi,
+       exp.geo_id,
        dr.log2fc,
        dr.padj
      FROM de_results dr

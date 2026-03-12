@@ -37,8 +37,19 @@ mod_de_heatmap_ui <- function(id) {
       )
     ),
     shiny::div(
-      style = "max-height: 600px; overflow-y: auto;",
-      ggiraph::girafeOutput(ns("de_heatmap"))
+      class = "row align-items-start",
+      shiny::div(
+        class = "col-12 col-lg-8",
+        shiny::div(
+          style = "max-height: 600px; overflow-y: auto;",
+          ggiraph::girafeOutput(ns("de_heatmap"))
+        )
+      ),
+      shiny::div(
+        class = "col-12 col-lg-4",
+        style = "padding-top: 8px;",
+        shiny::uiOutput(ns("experiment_panel"))
+      )
     )
   )
 }
@@ -91,6 +102,67 @@ mod_de_heatmap_server <- function(id, gene_results, db_con) {
         tapply(df$display_label, df$data_type, function(x) length(unique(x)))
       )
       max(200L, max_experiments * 28L)
+    })
+
+    # ── Experiment details panel (click to show) ───────────────────────────
+    output$experiment_panel <- shiny::renderUI({
+      selected_id <- input$de_heatmap_selected
+
+      if (is.null(selected_id) || !nzchar(selected_id)) {
+        return(bslib::card(
+          bslib::card_body(
+            shiny::p(
+              class = "text-muted",
+              style = "font-size: 0.85em;",
+              "Click a row to see experiment details."
+            )
+          )
+        ))
+      }
+
+      df <- de_data()
+      row <- df[df$experiment_id == selected_id, ][1, ]
+
+      doi_val <- row$doi
+      doi_cell <- if (!is.null(doi_val) && !is.na(doi_val) && nzchar(doi_val)) {
+        shiny::tags$a(
+          href = paste0("https://doi.org/", doi_val),
+          target = "_blank",
+          doi_val
+        )
+      } else {
+        shiny::span("\u2014")
+      }
+
+      bslib::card(
+        style = "font-size: 0.85em;",
+        bslib::card_header("Experiment details"),
+        bslib::card_body(
+          shiny::tags$table(
+            class = "table table-sm table-borderless mb-0",
+            shiny::tags$tbody(
+              make_row("Experiment:", na_or(row$display_label)),
+              make_row("Data type:", na_or(row$data_type)),
+              make_row("Strain:", na_or(row$strain)),
+              make_row("Genetic Background:", na_or(row$genetic_background)),
+              make_row("Treatment:", na_or(row$treatment)),
+              make_row("Treatment level:", na_or(row$treatment_level)),
+              make_row("Media:", na_or(row$media)),
+              make_row("Growth phase:", na_or(row$growth_phase)),
+              make_row("Reference Background:", na_or(row$ref_strain)),
+              make_row("Reference Treatment:", na_or(row$ref_treatment)),
+              make_row(
+                "Reference Treatment level:",
+                na_or(row$ref_treatment_level)
+              ),
+              make_row("Reference Media:", na_or(row$ref_media)),
+              make_row("Reference Growth phase:", na_or(row$ref_growth_phase)),
+              make_row("Lab group:", na_or(row$lab_group)),
+              make_row("DOI:", doi_cell)
+            )
+          )
+        )
+      )
     })
 
     # ── Render heatmap ─────────────────────────────────────────────────────

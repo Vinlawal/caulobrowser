@@ -352,7 +352,7 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
     ggiraph::geom_tile_interactive(
       ggplot2::aes(
         tooltip = tooltip_text,
-        data_id = paste0(gene_name, "__", experiment_id)
+        data_id = experiment_id
       ),
       color = "white",
       linewidth = 0.5
@@ -415,7 +415,12 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
           "font-size:12px;white-space:pre;"
         )
       ),
-      ggiraph::opts_selection(type = "none")
+      ggiraph::opts_hover(css = "opacity:0.8;"),
+      ggiraph::opts_selection(
+        type = "single",
+        only_shiny = TRUE,
+        css = "stroke:#333333;stroke-width:2px;"
+      )
     )
   )
 }
