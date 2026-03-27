@@ -88,6 +88,12 @@ app_ui <- function(request) {
         )
       ),
 
+      # ──Gene Viewer tab --───────────────────────────────────
+      bslib::nav_panel(
+        title = "Gene Viewer",
+        mod_gene_viewer_ui("gene_viewer")
+      ),
+
       # ── About / Help tab ───────────────────────────────────
       bslib::nav_panel(
         title = "About",

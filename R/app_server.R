@@ -61,4 +61,7 @@ app_server <- function(input, output, session) {
   mod_de_heatmap_server("de_heatmap", gene_results, db_con)
 
   # ── Module: Fitness Browser (Section 4) ──────-----------------
+
+  # ── Module: Gene Viewer ----------------──────-----------------
+  mod_gene_viewer_server("gene_viewer")
 }

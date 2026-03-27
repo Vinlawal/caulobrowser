@@ -17,6 +17,7 @@ Imports:
     glue,
     golem,
     htmltools,
+    JBrowseR,
     reactable,
     scales,
     shiny,
