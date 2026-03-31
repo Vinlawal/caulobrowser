@@ -20,10 +20,11 @@ usethis::use_package("ggirafe")
 usethis::use_package("reactable")
 usethis::use_package("shinyWidgets")
 usethis::use_package("tidyr")
+usethis::use_package("JBrowseR")
 
 # ── Add Modules ───────────────────────────────────
 # These were already created manually, but for new modules use:
-# golem::add_module(name = "my_module", with_test = TRUE)
+golem::add_module(name = "gene_viewer", with_test = TRUE)
 #
 # Existing modules:
 #   mod_gene_search    - Search bar and gene lookup
