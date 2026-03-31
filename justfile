@@ -2,8 +2,13 @@
 
 version := `Rscript -e "cat(read.dcf('DESCRIPTION')[,'Version'])"`
 
+# Clean deployments
+clean:
+    rm -rf deploy
+
 # Compile R package into tar.gz
-build_r:
+build_r: clean
+    mkdir deploy
     R CMD build .
     mv caulobrowser_{{version}}.tar.gz deploy/caulobrowser_{{version}}.tar.gz
 
@@ -33,4 +38,4 @@ run_docker:
         --rm \
         -p 3838:3838 \
         -v /Users/baldikacti/webapp-dev/caulobrowser_data/caulobrowser.duckdb:/database/caulobrowser.duckdb \
-        baldikacti/caulobrowser:latest
+        baldikacti/caulobrowser:{{version}}

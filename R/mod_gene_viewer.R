@@ -10,11 +10,9 @@
 mod_gene_viewer_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    bslib::card(
-      bslib::card_header("Gene Viewer"),
-      bslib::card_body(
-        JBrowseR::JBrowseROutput(ns("browserOutput"))
-      )
+    div(
+      h5("Gene Viewer"),
+      JBrowseR::JBrowseROutput(ns("browserOutput"))
     )
   )
 }
@@ -57,7 +55,10 @@ mod_gene_viewer_server <- function(id) {
     })
 
     # create the tracks array to pass to browser
-    tracks <- do.call(JBrowseR::tracks, c(list(annotations_track), wiggle_tracks))
+    tracks <- do.call(
+      JBrowseR::tracks,
+      c(list(annotations_track), wiggle_tracks)
+    )
 
     # set up the default session for the browser
     default_session <- JBrowseR::default_session(
