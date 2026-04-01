@@ -23,7 +23,7 @@ modern R tooling.
 | Gene overview table with external links | Section 1            | ✅         |
 | Time-resolved expression profiles       | Section 2            | ✅         |
 | Differential expression heatmap         | Section 3            | ✅         |
-| Genome browser (multi-track viewer)     | Section 4            | 🔜 Planned |
+| Genome browser (multi-track viewer)     | Section 4            | ✅         |
 | Data download (CSV)                     | Download page        | 🔜 Planned |
 
 ## Installation
