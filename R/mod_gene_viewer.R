@@ -28,6 +28,14 @@ mod_gene_viewer_server <- function(id) {
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/NC_011916.fasta.gz",
       bgzip = TRUE
     )
+
+    gff_index <- JBrowseR::text_index(
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.sorted.gff.gz.ix",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.sorted.gff.gz.ixx",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.sorted.gff.gz_meta.json",
+      "NC_011916"
+    )
+
     # create configuration for a JB2 GFF FeatureTrack
     annotations_track <- JBrowseR::track_feature(
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/NC_011916.sorted.gff.gz",
@@ -35,6 +43,13 @@ mod_gene_viewer_server <- function(id) {
     )
 
     wiggle_s3_urls <- c(
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/CtrA_Artemis_from_GEO_JS.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/CtrA_deltapleC-ChIP_artemis.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/flbD-ChIP_artemis.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/gcrA_artemis.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/SciP_Artemis_from_GEO_JS.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/SciP_deltamucR12-ChIP_artemis.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/staR_artemis.bigWig",
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2296_Pxyl-gcrA_PYEX_AntiFlag_Control_ChIPSeq.bigWig",
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_AntiFlag_ChIPSeq.bigWig",
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_Rifampicin_AntiFlag_ChIPSeq.bigWig",
@@ -74,6 +89,7 @@ mod_gene_viewer_server <- function(id) {
         assembly = assembly,
         # pass our tracks here
         tracks = tracks,
+        text_index = gff_index,
         default_session = default_session,
         theme = theme
       )
