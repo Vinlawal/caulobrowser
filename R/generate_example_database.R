@@ -47,9 +47,23 @@ CREATE TABLE genes (
     gene_id         VARCHAR PRIMARY KEY,
     cc_tag          VARCHAR,
     gene_name       VARCHAR,
+    start_pos       BIGINT,
+    end_pos         BIGINT,
+    strand          VARCHAR,
+    Dbxref          VARCHAR,
     ncbi_protein_id VARCHAR,
     gene_biotype    VARCHAR,
-    description     VARCHAR
+    product         VARCHAR,
+    essential       VARCHAR,
+    description     VARCHAR,
+    existence       VARCHAR,
+    COG             VARCHAR,
+    COGFun          VARCHAR,
+    COGDesc         VARCHAR,
+    TIGRFam         VARCHAR,
+    TIGRRoles       VARCHAR,
+    GO              VARCHAR,
+    KEGG            VARCHAR
 );"
   )
 
@@ -155,22 +169,90 @@ CREATE TABLE timecourse_expression (
         "CCNA_02761",
         "CCNA_01248"
       ),
-      cc_tag = c("CC_0001", "CC_0002", "CC_0003", "CC_0004", "CC_0005"),
+      cc_tag = c("CC_0092", "CC_0437", "CC_1190", "CC_2564", "CC_2678"),
       gene_name = c("ctrA", "dnaA", "fliF", "pilA", "rpoD"),
+      start_pos = c(101960L, 452915L, 1375993L, 2800802L, 2923673L),
+      end_pos = c(102943L, 453304L, 1376628L, 2801722L, 2923918L),
+      strand = c("-", "+", "+", "-", "+"),
+      Dbxref = c(
+        "GeneID:7332344",
+        "GeneID:7330573",
+        "GeneID:7333641",
+        "GeneID:7332750",
+        "GeneID:7330923"
+      ),
       ncbi_protein_id = c(
-        "WP_010919523.1",
-        "WP_010919456.1",
-        "WP_010921928.1",
-        "WP_010922042.1",
-        "WP_010920629.1"
+        "YP_002515465.1",
+        "YP_002515821.1",
+        "YP_002516621.1",
+        "YP_002518020.1",
+        "YP_002518134.1"
       ),
       gene_biotype = rep("protein_coding", 5),
+      product = c(
+        "UDP-glucose 4-epimerase",
+        "chemotaxis receiver domain protein cheYII",
+        "TetR-family transcriptional regulator",
+        "PBP2-family ligand-binding transcriptional regulator",
+        "hypothetical protein"
+      ),
+      essential = c(
+        NA_character_,
+        NA_character_,
+        NA_character_,
+        NA_character_,
+        NA_character_
+      ),
       description = c(
-        "cell cycle master regulator CtrA",
-        "chromosomal replication initiator protein DnaA",
-        "flagellar M-ring protein FliF",
-        "type IV pilin PilA",
-        "RNA polymerase sigma factor RpoD"
+        "UDP-glucose 4-epimerase",
+        "chemotaxis receiver domain protein cheYII",
+        "TetR-family transcriptional regulator",
+        "PBP2-family ligand-binding transcriptional regulator",
+        "hypothetical protein"
+      ),
+      existence = c(
+        "LC-MS,Ribosome profiling",
+        "LC-MS,Ribosome profiling",
+        "LC-MS,Ribosome profiling",
+        NA_character_,
+        "Ribosome profiling"
+      ),
+      COG = c("COG1087", "COG784", "COG1309", "COG583", NA_character_),
+      COGFun = c("M", "T", "K", "K", NA_character_),
+      COGDesc = c(
+        "UDP-glucose 4-epimerase",
+        "FOG: CheY-like receiver",
+        "Transcriptional regulator",
+        "Transcriptional regulator",
+        NA_character_
+      ),
+      TIGRFam = c(
+        "TIGR01179 UDP-glucose 4-epimerase [galE]",
+        NA_character_,
+        NA_character_,
+        NA_character_,
+        NA_character_
+      ),
+      TIGRRoles = c(
+        "Energy metabolism:Sugars",
+        NA_character_,
+        NA_character_,
+        NA_character_,
+        NA_character_
+      ),
+      GO = c(
+        "GO:0045226,GO:0006012,GO:0003978,GO:0050662,GO:0008831",
+        "GO:0006355,GO:0000160,GO:0000156",
+        "GO:0006355,GO:0016481,GO:0016566,GO:0003700",
+        "GO:0006355,GO:0003700",
+        NA_character_
+      ),
+      KEGG = c(
+        "ccs00052,ccs00520,ccs01100,ccs01250",
+        "ccs02020,ccs02030",
+        NA_character_,
+        NA_character_,
+        NA_character_
       ),
       stringsAsFactors = FALSE
     )
