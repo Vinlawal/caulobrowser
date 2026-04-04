@@ -21,10 +21,13 @@ mod_overview_table_ui <- function(id) {
 mod_overview_table_server <- function(id, gene_results, db_con) {
   shiny::moduleServer(id, function(input, output, session) {
     # Helper: produce an HTML anchor, or "—" when value is missing/empty
+    missing_val <- function(x) is.na(x) || !nzchar(x)
     ext_link <- function(url, label) {
       sprintf('<a href="%s" target="_blank">%s</a>', url, label)
     }
-    missing_val <- function(x) is.na(x) || !nzchar(x)
+    opt_link <- function(val, url, label) {
+      if (missing_val(val)) NULL else ext_link(url, label)
+    }
 
     # Build the overview data: one column per gene, rows = annotation categories
     overview_data <- shiny::reactive({
@@ -40,62 +43,65 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
       rows[["Locus Tag (CCNA)"]] <- genes$gene_id
       rows[["CC Tag"]] <- genes$cc_tag
       rows[["Biotype"]] <- genes$gene_biotype
+      rows[["Essential"]] <- genes$essential
+      rows[["Existence"]] <- genes$existence
 
       # ── Section: PRODUCT ───────────────────────────────────────────────────
       rows[[".hdr.Product"]] <- rep("", n)
       rows[["Description"]] <- genes$description
-      rows[["NCBI Protein"]] <- sapply(genes$ncbi_protein_id, function(pid) {
-        if (missing_val(pid)) {
-          "—"
-        } else {
-          ext_link(
-            paste0("https://www.ncbi.nlm.nih.gov/protein/", pid),
-            "Search NCBI"
-          )
-        }
-      })
-      rows[["UniProt"]] <- sapply(genes$gene_name, function(gn) {
-        if (missing_val(gn)) {
-          "—"
-        } else {
-          ext_link(
-            paste0(
-              "https://www.uniprot.org/uniprotkb?query=",
-              gn,
-              "+AND+organism_id:565050"
-            ),
-            "Search UniProt"
-          )
-        }
-      })
 
-      # ── Section: ADDITIONAL RESOURCES ──────────────────────────────────────
       rows[[".hdr.Additional Resources"]] <- rep("", n)
-
-      rows[["KEGG"]] <- sapply(genes$gene_id, function(locus) {
-        # gene_id holds the CCNA locus tag; KEGG organism code for NA1000 is ccs
-        if (missing_val(locus)) {
-          "—"
-        } else {
-          ext_link(
-            paste0("https://www.genome.jp/entry/ccs:", locus),
-            "Search KEGG"
-          )
-        }
-      })
-      rows[["BioCyc"]] <- sapply(genes$gene_id, function(locus) {
-        # CAULONA1000 is the BioCyc database for Caulobacter vibrioides NA1000
-        if (missing_val(locus)) {
-          "—"
-        } else {
-          ext_link(
-            paste0(
-              "https://biocyc.org/CAULONA1000/NEW-IMAGE?type=GENE&object=",
-              locus
+      rows[["Outlinks"]] <- sapply(seq_len(n), function(i) {
+        g <- genes[i, ]
+        links <- Filter(
+          Negate(is.null),
+          list(
+            opt_link(
+              g$ncbi_protein_id,
+              paste0(
+                "https://www.ncbi.nlm.nih.gov/protein/",
+                g$ncbi_protein_id
+              ),
+              "NCBI Protein"
             ),
-            "Search BioCyc"
+            opt_link(
+              g$gene_name,
+              paste0(
+                "https://www.uniprot.org/uniprotkb?query=",
+                g$gene_name,
+                "+AND+organism_id:565050"
+              ),
+              "UniProt"
+            ),
+            opt_link(
+              g$gene_id,
+              paste0("https://www.genome.jp/entry/ccs:", g$gene_id),
+              "KEGG"
+            ),
+            opt_link(
+              g$gene_id,
+              paste0(
+                "https://biocyc.org/CAULONA1000/NEW-IMAGE?type=GENE&object=",
+                g$gene_id
+              ),
+              "BioCyc"
+            ),
+            opt_link(
+              g$cc_tag,
+              paste0("https://string-db.org/network/190650/", g$cc_tag),
+              "STRING"
+            ),
+            opt_link(
+              g$gene_id,
+              paste0(
+                "https://papers.genomics.lbl.gov/cgi-bin/litSearch.cgi?query=",
+                g$gene_id
+              ),
+              "PaperBlast"
+            )
           )
-        }
+        )
+        if (length(links) == 0) "\u2014" else paste(links, collapse = " ")
       })
 
       # Convert to data frame (Category column + one column per gene)
