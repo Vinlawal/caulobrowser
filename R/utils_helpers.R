@@ -36,3 +36,76 @@ is_present <- function(x) {
 na_or <- function(x, or = "\u2014") {
   if (is_present(x)) x else or
 }
+
+#' Test whether a scalar is NA or empty string
+#'
+#' @param x A scalar value to test.
+#' @return `TRUE` if `x` is `NA` or has zero characters; `FALSE` otherwise.
+#' @noRd
+missing_val <- function(x) is.na(x) || !nzchar(x)
+
+#' Build an HTML anchor that opens in a new tab
+#'
+#' @param url Character. The href destination.
+#' @param label Character. The visible link text.
+#' @return A length-1 character string containing an `<a>` tag.
+#' @noRd
+ext_link <- function(url, label) {
+  sprintf('<a href="%s" target="_blank">%s</a>', url, label)
+}
+
+#' Optionally build an external link, returning NULL when the value is missing
+#'
+#' @param val Scalar. The identifier used in the URL; when `NA` or empty the
+#'   function returns `NULL`.
+#' @param url Character. Full URL to link to.
+#' @param label Character. Visible link text.
+#' @return An HTML anchor string, or `NULL` if `val` is missing/empty.
+#' @noRd
+opt_link <- function(val, url, label) {
+  if (missing_val(val)) NULL else ext_link(url, label)
+}
+
+#' Build a Shiny-wired Gene Viewer navigation link
+#'
+#' Generates an `<a>` tag whose `onclick` fires `Shiny.setInputValue` so the
+#' Gene Viewer module can navigate to the locus. Returns `NULL` when either
+#' coordinate is missing.
+#'
+#' @param start_pos Numeric or character. Start coordinate on the reference
+#'   sequence. Treated as missing if `NA` or empty.
+#' @param end_pos Numeric or character. End coordinate. Treated as missing if
+#'   `NA` or empty.
+#' @param ns A Shiny namespace function (from `session$ns`) used to scope the
+#'   input ID.
+#' @return An HTML anchor string, or `NULL`.
+#' @noRd
+viewer_link <- function(start_pos, end_pos, ns) {
+  if (missing_val(start_pos) || missing_val(end_pos)) {
+    return(NULL)
+  }
+  loc <- sprintf("gi|221232939|ref|NC_011916.1|:%s..%s", start_pos, end_pos)
+  input_id <- ns("viewer_nav")
+  sprintf(
+    '<a href="#" onclick="Shiny.setInputValue(\'%s\', \'%s\', {priority: \'event\'}); return false;">link</a>',
+    input_id,
+    loc
+  )
+}
+
+#' Test whether a Category value is a section-header sentinel
+#'
+#' Rows whose `Category` starts with `".hdr."` are rendered as section headers
+#' in the overview reactable, not as data rows.
+#'
+#' @param cat Character. A value from the `Category` column.
+#' @return `TRUE` if `cat` begins with `".hdr."`.
+#' @noRd
+is_hdr <- function(cat) startsWith(cat, ".hdr.")
+
+#' Strip the section-header sentinel prefix from a Category value
+#'
+#' @param cat Character. A `.hdr.*` Category value.
+#' @return The display label with the `".hdr."` prefix removed.
+#' @noRd
+hdr_label <- function(cat) sub("^\\.hdr\\.", "", cat)

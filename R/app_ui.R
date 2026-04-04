@@ -10,6 +10,7 @@ app_ui <- function(request) {
     golem_add_external_resources(),
 
     bslib::page_navbar(
+      id = "main_nav",
       title = shiny::span(
         shiny::strong("CauloBrowser"),
         style = "font-size: 1.3em;"

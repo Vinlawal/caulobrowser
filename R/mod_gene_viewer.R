@@ -20,7 +20,7 @@ mod_gene_viewer_ui <- function(id) {
 #' gene_viewer Server Functions
 #'
 #' @noRd
-mod_gene_viewer_server <- function(id) {
+mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     # create the necessary JB2 assembly configuration
@@ -90,7 +90,8 @@ mod_gene_viewer_server <- function(id) {
         # pass our tracks here
         tracks = tracks,
         text_index = gff_index,
-        default_session = default_session,
+        location = location(),
+        defaultSession = default_session,
         theme = theme
       )
     )

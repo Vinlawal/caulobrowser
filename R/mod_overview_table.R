@@ -20,14 +20,7 @@ mod_overview_table_ui <- function(id) {
 
 mod_overview_table_server <- function(id, gene_results, db_con) {
   shiny::moduleServer(id, function(input, output, session) {
-    # Helper: produce an HTML anchor, or "—" when value is missing/empty
-    missing_val <- function(x) is.na(x) || !nzchar(x)
-    ext_link <- function(url, label) {
-      sprintf('<a href="%s" target="_blank">%s</a>', url, label)
-    }
-    opt_link <- function(val, url, label) {
-      if (missing_val(val)) NULL else ext_link(url, label)
-    }
+    ns <- session$ns
 
     # Build the overview data: one column per gene, rows = annotation categories
     overview_data <- shiny::reactive({
@@ -45,6 +38,10 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
       rows[["Biotype"]] <- genes$gene_biotype
       rows[["Essential"]] <- genes$essential
       rows[["Existence"]] <- genes$existence
+      rows[["Gene Viewer"]] <- sapply(seq_len(n), \(i) {
+        g <- genes[i, ]
+        viewer_link(g$start_pos, g$end_pos, ns)
+      })
 
       # ── Section: PRODUCT ───────────────────────────────────────────────────
       rows[[".hdr.Product"]] <- rep("", n)
@@ -116,12 +113,15 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
       overview_df
     })
 
+    # Return the location string when a Gene Viewer link is clicked
+    viewer_location <- shiny::reactive({
+      shiny::req(input$viewer_nav)
+      input$viewer_nav
+    })
+
     output$overview_table_ui <- shiny::renderUI({
       shiny::req(overview_data())
       df <- overview_data()
-
-      is_hdr <- function(cat) startsWith(cat, ".hdr.")
-      hdr_label <- function(cat) sub("^\\.hdr\\.", "", cat)
 
       hdr_style <- list(
         backgroundColor = "#2c3e50",
@@ -183,5 +183,7 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
         )
       )
     })
+
+    viewer_location
   })
 }

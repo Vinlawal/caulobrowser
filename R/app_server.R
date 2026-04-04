@@ -52,7 +52,7 @@ app_server <- function(input, output, session) {
   shiny::outputOptions(output, "has_results", suspendWhenHidden = FALSE)
 
   # ── Module: Overview Table (Section 1) ────────────────────────
-  mod_overview_table_server("overview_table", gene_results, db_con)
+  viewer_location <- mod_overview_table_server("overview_table", gene_results, db_con)
 
   # ── Module: Expression Profiles (Section 2) ───────────────────
   mod_expression_server("expression", gene_results, db_con)
@@ -63,6 +63,11 @@ app_server <- function(input, output, session) {
   # ── Module: Fitness Browser (Section 4) ──────-----------------
   mod_de_heatmap_server("fitness_heatmap", gene_results, c("tnseq"), db_con)
 
+  # ── Navigate to Gene Viewer tab when a location is selected ───
+  shiny::observeEvent(viewer_location(), {
+    bslib::nav_select("main_nav", "Gene Viewer", session = session)
+  })
+
   # ── Module: Gene Viewer ----------------──────-----------------
-  mod_gene_viewer_server("gene_viewer")
+  mod_gene_viewer_server("gene_viewer", location = viewer_location)
 }
