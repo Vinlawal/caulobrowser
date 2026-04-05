@@ -1,3 +1,5 @@
+# caulobrowser 0.2.0
+
 # caulobrowser 0.1.2
 
 # caulobrowser 0.1.1
