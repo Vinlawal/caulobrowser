@@ -35,38 +35,109 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
       rows[["Name"]] <- genes$gene_name
       rows[["Locus Tag (CCNA)"]] <- genes$gene_id
       rows[["CC Tag"]] <- genes$cc_tag
+      rows[["Genome location"]] <- paste(
+        genes$start_pos,
+        genes$end_pos,
+        sep = ".."
+      )
+      rows[["Strand"]] <- genes$strand
       rows[["Biotype"]] <- genes$gene_biotype
       rows[["Essential"]] <- genes$essential
-      rows[["Existence"]] <- genes$existence
-      rows[["Gene Viewer"]] <- sapply(seq_len(n), \(i) {
+      rows[["Gene Viewer"]] <- sapply(seq_len(n), function(i) {
         g <- genes[i, ]
         viewer_link(g$start_pos, g$end_pos, ns)
       })
 
       # ── Section: PRODUCT ───────────────────────────────────────────────────
       rows[[".hdr.Product"]] <- rep("", n)
-      rows[["Description"]] <- genes$description
+      rows[["Length"]] <- genes$length
+      rows[["Mass"]] <- genes$mass
+      rows[["Structure"]] <- sapply(seq_len(n), function(i) {
+        g <- genes[i, ]
+        links <- Filter(
+          Negate(is.null),
+          list(
+            opt_link(
+              g$uniprot_id,
+              sprintf(
+                "https://search.foldseek.com/search?accession=%s&source=AlphaFoldDB",
+                g$uniprot_id
+              ),
+              "Foldseek"
+            ),
+            {
+              pdbid <- strsplit(g$PDB, ";")[[1]]
+              url <- sprintf("https://www.rcsb.org/structure/%s", pdbid)
+              mapply(
+                \(x, y) opt_link(x, y, x),
+                pdbid,
+                url,
+                USE.NAMES = FALSE,
+                SIMPLIFY = FALSE
+              ) |>
+                unlist() |>
+                paste(collapse = " ")
+            }
+          )
+        )
+        if (length(links) == 0) "\u2014" else paste(links, collapse = " ")
+      })
+      rows[["Catalytic Activity"]] <- sapply(seq_len(n), function(i) {
+        g <- genes[i, ]
+        if (missing_val(g$rhea_id)) {
+          return(NA_character_)
+        }
+        rheaid <- strsplit(g$rhea_id, " ")[[1]]
+        url <- sprintf(
+          "https://www.rhea-db.org/rhea/%s",
+          gsub("RHEA:", "", rheaid)
+        )
+        mapply(
+          \(x, y) opt_link(x, y, x),
+          rheaid,
+          url,
+          USE.NAMES = FALSE,
+          SIMPLIFY = FALSE
+        ) |>
+          unlist() |>
+          paste(collapse = " ")
+      })
+      rows[["Product"]] <- genes$product
+      rows[["Function"]] <- genes$function_cc
 
+      # ── Section: Additional Resources───────────────────────────────────────
       rows[[".hdr.Additional Resources"]] <- rep("", n)
+      rows[["Homologies"]] <- sapply(seq_len(n), function(i) {
+        g <- genes[i, ]
+        cog <- g$COG
+        if (missing_val(cog)) {
+          NA_character_
+        } else {
+          opt_link(
+            cog,
+            paste0("https://www.ncbi.nlm.nih.gov/research/cog/cog/", cog),
+            cog
+          )
+        }
+      })
       rows[["Outlinks"]] <- sapply(seq_len(n), function(i) {
         g <- genes[i, ]
         links <- Filter(
           Negate(is.null),
           list(
             opt_link(
-              g$ncbi_protein_id,
+              g$protein_id,
               paste0(
                 "https://www.ncbi.nlm.nih.gov/protein/",
-                g$ncbi_protein_id
+                g$protein_id
               ),
               "NCBI Protein"
             ),
             opt_link(
-              g$gene_name,
-              paste0(
-                "https://www.uniprot.org/uniprotkb?query=",
-                g$gene_name,
-                "+AND+organism_id:565050"
+              g$uniprot_id,
+              sprintf(
+                "https://www.uniprot.org/uniprotkb/%s/entry",
+                g$uniprot_id
               ),
               "UniProt"
             ),
