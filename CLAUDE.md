@@ -44,9 +44,9 @@ CauloBrowser is a **golem-based R package** that exposes a single Shiny app via 
 
 All data lives in a **DuckDB** embedded database opened in read-only mode per session. The database path is configured via the `CAULOBROWSER_DB_PATH` environment variable (set in `dev/run_dev.R`). Schema (five tables):
 
-- `genes` — `gene_id` (VARCHAR PK, CCNA_XXXXX NA1000 locus tag), `cc_tag` (CC_XXXX CB15 legacy tag), `gene_name`, `ncbi_protein_id`, `gene_biotype`, `description`
+- `genes` — `gene_id` (VARCHAR PK, CCNA_XXXXX NA1000 locus tag), `cc_tag` (CC_XXXX CB15 legacy tag), `gene_name`, `uniprot_id`, `start_pos` (BIGINT), `end_pos` (BIGINT), `strand`, `length`, `mass`, `gene_biotype`, `product`, `description`, `protein_names`, `function_cc`, `protein_families`, `essential`, `Dbxref`, `existence_ncbi`, `existence_uniprot`, `COG`, `COGFun`, `COGDesc`, `TIGRFam`, `TIGRRoles`, `GO`, `KEGG`, `activity_regulation`, `rhea_id`, `interacts`, `subcellular_location_cc`, `ptm`, `pubmed_id`, `doi`, `EMBL`, `protein_id`, `PDB`, `SMR`, `sequence_similarities`, `protein_sequence`
 
-- `experiments` — `experiment_id` (VARCHAR PK), `display_label`, `experiment_class`, `data_type`, `strain`, `genetic_background`, `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`, `ref_treatment`, `ref_treatment_level`, `ref_growth_phase`, `ref_media`, `lab_group`, `doi`, `geo_id`, `date_added`
+- `experiments` — `experiment_id` (VARCHAR PK), `display_label`, `experiment_class`, `data_type`, `strain`, `genetic_background`, `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`, `ref_treatment`, `ref_treatment_level`, `ref_growth_phase.`, `ref_media.`, `lab_group`, `doi`, `geo_id`, `date_added`
 
 - `experiment_conditions` — (`experiment_id`, `condition_label`) composite PK; `condition_order` (INTEGER), `condition_value` (DOUBLE), `condition_units`, `display_label`. FK → `experiments`
 

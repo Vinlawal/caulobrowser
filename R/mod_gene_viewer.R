@@ -30,15 +30,15 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
     )
 
     gff_index <- JBrowseR::text_index(
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.sorted.gff.gz.ix",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.sorted.gff.gz.ixx",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.sorted.gff.gz_meta.json",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.final.gff.gz.ix",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.final.gff.gz.ixx",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.final.gff.gz_meta.json",
       "NC_011916"
     )
 
     # create configuration for a JB2 GFF FeatureTrack
     annotations_track <- JBrowseR::track_feature(
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/NC_011916.sorted.gff.gz",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/NC_011916.final.gff.gz",
       assembly
     )
 
