@@ -186,12 +186,10 @@ mod_overview_table_server <- function(id, gene_results, db_con) {
 
     # Return the location string when a Gene Viewer link is clicked
     viewer_location <- shiny::reactive({
-      shiny::req(input$viewer_nav)
       input$viewer_nav
     })
 
     output$overview_table_ui <- shiny::renderUI({
-      shiny::req(overview_data())
       df <- overview_data()
 
       hdr_style <- list(

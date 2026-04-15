@@ -85,8 +85,7 @@ mod_expression_server <- function(id, gene_results, db_con) {
       genes <- gene_results()
       shiny::req(
         nrow(genes) > 0,
-        input$genetic_background,
-        nchar(input$genetic_background) > 0
+        input$genetic_background
       )
       get_expression_data(
         db_con(),

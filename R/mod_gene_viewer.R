@@ -83,6 +83,15 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
 
     theme <- JBrowseR::theme("#5da8a3", "#333")
 
+    effective_location <- shiny::reactive({
+      loc <- location()
+      if (is.null(loc) || !nzchar(trimws(loc))) {
+        "gi|221232939|ref|NC_011916.1|:1..4016942"
+      } else {
+        loc
+      }
+    })
+
     output$browserOutput <- JBrowseR::renderJBrowseR(
       JBrowseR::JBrowseR(
         "View",
@@ -90,7 +99,7 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
         # pass our tracks here
         tracks = tracks,
         text_index = gff_index,
-        location = location(),
+        location = effective_location(),
         defaultSession = default_session,
         theme = theme
       )
