@@ -59,7 +59,9 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2300_sigma32-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2301_sigma54-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
       "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_WT_PYE_AntiRpoD_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_WT_PYE_Rifampicin_AntiRpoD_ChIPSeq.bigWig"
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_WT_PYE_Rifampicin_AntiRpoD_ChIPSeq.bigWig",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/Chienlab_WT_PYE_minusstrand_TnSeq.bw",
+      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/Chienlab_WT_PYE_plusstrand_TnSeq.bw"
     )
 
     wiggle_tracks <- lapply(wiggle_s3_urls, \(x) {
