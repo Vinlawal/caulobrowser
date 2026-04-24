@@ -25,43 +25,43 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
     ns <- session$ns
     # create the necessary JB2 assembly configuration
     assembly <- JBrowseR::assembly(
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/NC_011916.fasta.gz",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/NC_011916.fasta.gz",
       bgzip = TRUE
     )
 
     gff_index <- JBrowseR::text_index(
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.final.gff.gz.ix",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.final.gff.gz.ixx",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/trix/NC_011916.final.gff.gz_meta.json",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/trix_output/trix/NC_011916.final.gff.gz.ix",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/trix_output/trix/NC_011916.final.gff.gz.ixx",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/trix_output/trix/NC_011916.final.gff.gz_meta.json",
       "NC_011916"
     )
 
     # create configuration for a JB2 GFF FeatureTrack
     annotations_track <- JBrowseR::track_feature(
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/NC_011916.final.gff.gz",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/NC_011916.final.gff.gz",
       assembly
     )
 
     wiggle_s3_urls <- c(
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/CtrA_Artemis_from_GEO_JS.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/CtrA_deltapleC-ChIP_artemis.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/flbD-ChIP_artemis.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/gcrA_artemis.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/SciP_Artemis_from_GEO_JS.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/SciP_deltamucR12-ChIP_artemis.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/staR_artemis.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2296_Pxyl-gcrA_PYEX_AntiFlag_Control_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2298_Pgcra-gcrA-3xFLAG_PYE_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2299_rpoC-3xFLAG_PYE_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2299_rpoC-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2300_sigma32-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_ML2301_sigma54-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_WT_PYE_AntiRpoD_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.amazonaws.com/Laublab_NA1000_WT_PYE_Rifampicin_AntiRpoD_ChIPSeq.bigWig",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/Chienlab_WT_PYE_minusstrand_TnSeq.bw",
-      "https://aws-s3-caulobrowser-data-056153745207-us-east-1-an.s3.us-east-1.amazonaws.com/Chienlab_WT_PYE_plusstrand_TnSeq.bw"
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/CtrA_Artemis_from_GEO_JS.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/CtrA_deltapleC-ChIP_artemis.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/flbD-ChIP_artemis.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/gcrA_artemis.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/SciP_Artemis_from_GEO_JS.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/SciP_deltamucR12-ChIP_artemis.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/staR_artemis.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2296_Pxyl-gcrA_PYEX_AntiFlag_Control_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_Rifampicin_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2298_Pgcra-gcrA-3xFLAG_PYE_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2299_rpoC-3xFLAG_PYE_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2299_rpoC-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2300_sigma32-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2301_sigma54-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_WT_PYE_AntiRpoD_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_WT_PYE_Rifampicin_AntiRpoD_ChIPSeq.bigWig",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/WT1_2_datafromolTnseqArchive/Chienlab_WT_PYE_minusstrand_TnSeq.bw",
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/WT1_2_datafromolTnseqArchive/Chienlab_WT_PYE_plusstrand_TnSeq.bw"
     )
 
     wiggle_tracks <- lapply(wiggle_s3_urls, \(x) {
