@@ -35,7 +35,12 @@ remotes::install_github("baldikacti/caulobrowser")
 
 ## Quick Start
 
-### 1. Generate a demo database
+### Without Docker (R)
+
+1.  Generate a demo database or download the real database using
+    [Pelican](https://docs.pelicanplatform.org/install):
+
+**Demo database**
 
 ``` r
 caulobrowser::generate_example_database(path = ".")
@@ -45,29 +50,35 @@ This creates a `caulobrowser.duckdb` file with demo data for 5 genes
 (ctrA, ftsZ, popZ, dnaA, ccrM) including expression time-courses and
 differential expression results.
 
-### 2. Run the app
+**Real database**
+
+``` bash
+pelican object get osdf:///unity-hpc/caulobrowser/caulobrowser.duckdb .
+```
+
+This downloads the real app database to the current directory. (Dot
+represents current directory)
+
+2.  Run the app:
 
 ``` r
-# Set the `CAULOBROWSER_DB_PATH` to where your database is
-Sys.setenv(
-  "CAULOBROWSER_DB_PATH" = "/path/to/caulobrowser.duckdb"
-)
+# Set CAULOBROWSER_DB_PATH to where your database is
+Sys.setenv("CAULOBROWSER_DB_PATH" = "/path/to/caulobrowser.duckdb")
 caulobrowser::run_app()
 # Or during development:
 golem::run_dev()
 ```
 
-### 3. Run the app with Docker
+### With Docker
 
-The app can be launched with Docker without setting up any other
-dependency other than Docker.
+The app can be launched with Docker without any other dependencies.
 
-1.  If you do not have Docker, install from
-    [here](https://docs.docker.com/engine/install/). After installing
-    Docker, make sure the Docker daemon is running.
+1.  Install Docker from
+    [docs.docker.com/engine/install](https://docs.docker.com/engine/install/)
+    and make sure the Docker daemon is running.
 
-2.  Download the Caulobrowser database into `~/Downloads/`. (Or any
-    other path)
+2.  Download the Caulobrowser database into `~/Downloads/` (or any other
+    path):
 
 ``` bash
 docker run --rm \
@@ -79,7 +90,7 @@ docker run --rm \
 > The database file will be saved to `~/Downloads/caulobrowser.duckdb`
 > on your machine.
 
-3.  Run the Caulobrowser app, mounting the downloaded database file.
+3.  Run the app, mounting the downloaded database file:
 
 ``` bash
 docker run --rm -p 3838:3838 \
@@ -91,66 +102,13 @@ docker run --rm -p 3838:3838 \
 
 ## Project Structure
 
-    caulobrowser/
-    ├── DESCRIPTION              # Package metadata & dependencies
-    ├── NAMESPACE
-    ├── R/
-    │   ├── app_config.R         # golem config access
-    │   ├── app_server.R         # Main server function
-    │   ├── app_ui.R             # Main UI function (bslib page_navbar)
-    │   ├── run_app.R            # Entry point
-    │   ├── fct_database.R       # DuckDB connection & query functions
-    │   ├── fct_plots.R          # Plotting helpers (ggiraph, SVG schematics)
-    │   ├── generate_example_database.R  # Demo database generator
-    │   ├── mod_gene_search.R    # Module: gene search bar
-    │   ├── mod_overview_table.R # Module: Figure 1 overview table
-    │   ├── mod_expression.R     # Module: Figure 2 expression & localization
-    │   └── mod_de_heatmap.R     # Module: Section 3 DE heatmap
-    ├── dev/
-    │   ├── 01_start.R           # Initial project setup
-    │   ├── 02_dev.R             # Development workflow
-    │   ├── 03_deploy.R          # Deployment helpers
-    │   └── run_dev.R            # Quick launch
-    ├── inst/
-    │   ├── app/www/             # Static assets (CSS, favicon)
-    │   ├── extdata/             # DuckDB database file
-    │   └── golem-config.yml     # App configuration
-    ├── tests/
-    │   └── testthat/            # Unit tests
-    └── app.R                    # Deployment entry point
+See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for a full directory
+overview.
 
 ## Database Schema
 
-The app reads from a DuckDB database with five tables:
-
-- `genes` — `gene_id` (VARCHAR PK, CCNA_XXXXX NA1000 locus tag),
-  `cc_tag` (CC_XXXX CB15 legacy tag), `gene_name`, `ncbi_protein_id`,
-  `gene_biotype`, `description`
-
-- `experiments` — `experiment_id` (VARCHAR PK), `display_label`,
-  `experiment_class`, `data_type`, `strain`, `genetic_background`,
-  `treatment`, `treatment_level`, `growth_phase`, `media`, `ref_strain`,
-  `ref_treatment`, `ref_treatment_level`, `ref_growth_phase`,
-  `ref_media`, `lab_group`, `doi`, `geo_id`, `date_added`
-
-- `experiment_conditions` — (`experiment_id`, `condition_label`)
-  composite PK; `condition_order` (INTEGER), `condition_value` (DOUBLE),
-  `condition_units`, `display_label`. FK → `experiments`
-
-- `de_results` — (`gene_id`, `experiment_id`) composite PK; `log2fc`
-  (DOUBLE NOT NULL), `padj` (DOUBLE). FK → `genes` + `experiments`
-
-- `timecourse_expression` — (`gene_id`, `experiment_id`,
-  `condition_label`) composite PK; `expression_value` (DOUBLE NOT NULL).
-  FK → `genes`, `experiments`, and
-  `experiment_conditions(experiment_id, condition_label)`
-
-Indexes on: `de_results(experiment_id)`, `de_results(gene_id)`,
-`timecourse_expression(gene_id)`,
-`timecourse_expression(experiment_id)`,
-`timecourse_expression(gene_id, experiment_id)`,
-`experiments(experiment_class)`, `experiments(data_type)`,
-`experiments(lab_group)`
+See [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for the full schema and
+index definitions.
 
 ## References
 
