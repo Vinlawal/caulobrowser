@@ -22,7 +22,7 @@ test_that("search_genes finds gene by cc_tag", {
   con <- generate_example_database(":memory:")
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
-  result <- search_genes(con, "CC_0001")
+  result <- search_genes(con, "CC_0092")
   expect_equal(nrow(result), 1)
 })
 

@@ -1,38 +1,69 @@
-testServer(
-  mod_gene_viewer_server,
-  # Add here your module params
-  args = list()
-  , {
-    ns <- session$ns
-    expect_true(
-      inherits(ns, "function")
-    )
-    expect_true(
-      grepl(id, ns(""))
-    )
-    expect_true(
-      grepl("test", ns("test"))
-    )
-    # Here are some examples of tests you can
-    # run on your module
-    # - Testing the setting of inputs
-    # session$setInputs(x = 1)
-    # expect_true(input$x == 1)
-    # - If ever your input updates a reactiveValues
-    # - Note that this reactiveValues must be passed
-    # - to the testServer function via args = list()
-    # expect_true(r$x == 1)
-    # - Testing output
-    # expect_true(inherits(output$tbl$html, "html"))
-})
- 
-test_that("module ui works", {
+test_that("mod_gene_viewer_ui works", {
   ui <- mod_gene_viewer_ui(id = "test")
   golem::expect_shinytaglist(ui)
-  # Check that formals have not been removed
   fmls <- formals(mod_gene_viewer_ui)
-  for (i in c("id")){
+  expect_true("id" %in% names(fmls))
+})
+
+test_that("mod_gene_viewer_server has correct formals", {
+  fmls <- formals(mod_gene_viewer_server)
+  for (i in c("id", "location", "db_con")) {
     expect_true(i %in% names(fmls))
   }
 })
- 
+
+# Namespace wiring
+testServer(
+  mod_gene_viewer_server,
+  args = list(
+    location = shiny::reactive(NULL),
+    db_con = shiny::reactiveVal(NULL)
+  ),
+  {
+    ns <- session$ns
+    expect_true(inherits(ns, "function"))
+    expect_true(grepl("test", ns("test")))
+  }
+)
+
+# effective_location defaults to the full genome span when location is NULL
+testServer(
+  mod_gene_viewer_server,
+  args = list(
+    location = shiny::reactive(NULL),
+    db_con = shiny::reactiveVal(NULL)
+  ),
+  {
+    loc <- effective_location()
+    expect_type(loc, "character")
+    expect_match(loc, "NC_011916.1", fixed = TRUE)
+    expect_match(loc, "1..4016942", fixed = TRUE)
+  }
+)
+
+# effective_location defaults to the full genome span when location is empty
+testServer(
+  mod_gene_viewer_server,
+  args = list(
+    location = shiny::reactive(""),
+    db_con = shiny::reactiveVal(NULL)
+  ),
+  {
+    expect_match(effective_location(), "1..4016942", fixed = TRUE)
+  }
+)
+
+# effective_location returns the passed location string when it is set
+testServer(
+  mod_gene_viewer_server,
+  args = list(
+    location = shiny::reactive("gi|221232939|ref|NC_011916.1|:101960..102943"),
+    db_con = shiny::reactiveVal(NULL)
+  ),
+  {
+    expect_equal(
+      effective_location(),
+      "gi|221232939|ref|NC_011916.1|:101960..102943"
+    )
+  }
+)

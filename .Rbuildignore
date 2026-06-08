@@ -25,3 +25,4 @@ rsconnect/
 deploy/
 ^\./deploy$
 ^justfile$
+^test\.R$
