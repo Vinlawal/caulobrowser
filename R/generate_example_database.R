@@ -1,6 +1,6 @@
 #' Generate an example CauloBrowser database
 #'
-#' Creates a DuckDB database pre-populated with demo data for five
+#' Creates a DuckDB database pre-populated with demo data for six
 #' *Caulobacter crescentus* NA1000 genes across two experiments: a
 #' cell-cycle RNA-seq timecourse and a CtrA-depletion DE comparison.
 #'
@@ -154,6 +154,20 @@ CREATE TABLE timecourse_expression (
 
   DBI::dbExecute(
     con,
+    "
+CREATE TABLE gene_viewer_metadata (
+    assembly    VARCHAR,
+    text_index  VARCHAR[4],
+    tracks      STRUCT(
+                    experiment_id VARCHAR,
+                    track_type    VARCHAR,
+                    https_paths   VARCHAR
+                )[]
+);"
+  )
+
+  DBI::dbExecute(
+    con,
     "CREATE INDEX idx_de_exp      ON de_results(experiment_id);"
   )
   DBI::dbExecute(con, "CREATE INDEX idx_de_gene     ON de_results(gene_id);")
@@ -200,7 +214,7 @@ CREATE TABLE timecourse_expression (
         "GeneID:7332750",
         "GeneID:7330923"
       ),
-      ncbi_protein_id = c(
+      protein_id = c(
         "YP_002515465.1",
         "YP_002515821.1",
         "YP_002516621.1",
@@ -229,7 +243,7 @@ CREATE TABLE timecourse_expression (
         "PBP2-family ligand-binding transcriptional regulator",
         "hypothetical protein"
       ),
-      existence = c(
+      existence_ncbi = c(
         "LC-MS,Ribosome profiling",
         "LC-MS,Ribosome profiling",
         "LC-MS,Ribosome profiling",
@@ -366,6 +380,19 @@ CREATE TABLE timecourse_expression (
     })
   )
   DBI::dbAppendTable(con, "timecourse_expression", tc_expr)
+
+  # ── Gene viewer metadata ─────────────────────────────────────────────────────
+  DBI::dbExecute(
+    con,
+    "INSERT INTO gene_viewer_metadata VALUES (
+      'GCF_000022005.1',
+      ['ctrA', 'dnaA', 'fliF', 'pilA'],
+      [
+        {'experiment_id': 'TC_RNAseq_WT_CC', 'track_type': 'bigwig', 'https_paths': 'https://example.com/tc_rnaseq_wt_cc.bw'},
+        {'experiment_id': 'DE_ctrA_depl',    'track_type': 'bigwig', 'https_paths': 'https://example.com/de_ctra_depl.bw'}
+      ]
+    );"
+  )
 
   if (in_memory) {
     return(invisible(con))
