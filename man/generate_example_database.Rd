@@ -23,7 +23,7 @@ When `path = ":memory:"`, the open `DBI` connection (caller is
   responsible for closing it).  Otherwise the resolved `path`, invisibly.
 }
 \description{
-Creates a DuckDB database pre-populated with demo data for five
+Creates a DuckDB database pre-populated with demo data for six
 *Caulobacter crescentus* NA1000 genes across two experiments: a
 cell-cycle RNA-seq timecourse and a CtrA-depletion DE comparison.
 }

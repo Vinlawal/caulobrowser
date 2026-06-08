@@ -1,4 +1,5 @@
 FROM rocker/r-ver:4.5.2
+ARG TARGETARCH
 RUN apt-get update -y && apt-get install -y \
     wget \
     tar \
@@ -12,9 +13,23 @@ RUN apt-get update -y && apt-get install -y \
     zlib1g-dev \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
+# Setup pelican binary
+RUN mkdir -p /usr/local/bin && \
+    case "$TARGETARCH" in \
+      amd64) ARCH="x86_64" ;; \
+      arm64) ARCH="arm64" ;; \
+      *) echo "Unsupported arch: $TARGETARCH" && exit 1 ;; \
+    esac && \
+    wget -O - "https://dl.pelicanplatform.org/latest/pelican_$(uname -s)_${ARCH}.tar.gz" \
+    | tar zx -C /usr/local/bin/ --strip-components=1
 RUN mkdir -p /usr/local/lib/R/etc/ /usr/lib/R/etc/
 RUN echo "options(renv.config.pak.enabled = FALSE, repos = c(CRAN = 'https://cran.rstudio.com/'), download.file.method = 'libcurl', Ncpus = 4)" | tee /usr/local/lib/R/etc/Rprofile.site | tee /usr/lib/R/etc/Rprofile.site
 RUN R -e 'install.packages("remotes")'
 RUN R -e 'remotes::install_version("renv", version = "1.1.7")'
 COPY renv.lock renv.lock
 RUN --mount=type=cache,id=renv-cache,target=/root/.cache/R/renv R -e 'renv::restore()'
+# download duckdb extensions
+RUN R -q -e 'library(duckdb); \
+  con <- dbConnect(duckdb()); \
+  for (ext in c("json")) dbExecute(con, sprintf("INSTALL %s", ext)); \
+  dbDisconnect(con, shutdown = TRUE)'
