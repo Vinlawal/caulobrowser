@@ -2,8 +2,8 @@
 
 ```
 caulobrowser/
-├── DESCRIPTION              # Package metadata & dependencies
-├── NAMESPACE
+├── DESCRIPTION              # Package metadata & dependencies (Updated automatically)
+├── NAMESPACE		     # Updated automatically
 ├── R/
 │   ├── app_config.R         # golem config access
 │   ├── app_server.R         # Main server function

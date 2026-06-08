@@ -17,8 +17,12 @@ build_readme:
     Rscript -e "devtools::build_readme()"
 
 # Build checks
-build_check:
-    R CMD check .
+check:
+    Rscript -e "devtools::check()"
+
+# Run Unit tests
+test:
+    Rscript -e "devtools::test()"
 
 # Build base docker container
 build_docker_base: build_r
