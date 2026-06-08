@@ -42,6 +42,11 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
       assembly
     )
 
+    operon_track <- JBrowseR::track_feature(
+      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/operons.gff3.gz",
+      assembly
+    )
+
     wiggle_s3_urls <- c(
       "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/CtrA_Artemis_from_GEO_JS.bigWig",
       "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/CtrA_deltapleC-ChIP_artemis.bigWig",
@@ -74,13 +79,14 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
     # create the tracks array to pass to browser
     tracks <- do.call(
       JBrowseR::tracks,
-      c(list(annotations_track), wiggle_tracks)
+      c(list(annotations_track, operon_track), wiggle_tracks)
     )
 
     # set up the default session for the browser
     default_session <- JBrowseR::default_session(
       assembly,
-      c(annotations_track)
+      c(annotations_track),
+      display_assembly = FALSE
     )
 
     theme <- JBrowseR::theme("#5da8a3", "#333")
