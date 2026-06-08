@@ -45,7 +45,8 @@ get_db_connection <- function() {
     "experiments",
     "experiment_conditions",
     "de_results",
-    "timecourse_expression"
+    "timecourse_expression",
+    "gene_viewer_metadata"
   )
   missing <- setdiff(required, tables)
 
@@ -103,6 +104,23 @@ search_genes <- function(con, query) {
 
   # Same terms bound three times (one per IN clause)
   DBI::dbGetQuery(con, sql, params = rep(terms, 3))
+}
+
+
+#' Retrieve Gene Viewever Metadata from the Duckdb database connection
+#'
+#' @param con DBI connection
+#' @return LIST with the following fields.
+#' assembly: CHARACTER,
+#' text_index: CHARACTER[4],
+#' tracks: DATAFRAME(experiment_id: CHARACTER, track_type: CHARACTER, https_paths: CHARACTER)
+#' @noRd
+get_gene_viewer_metadata <- function(con) {
+  json <- DBI::dbGetQuery(
+    con,
+    "SELECT to_json(gene_viewer_metadata) AS j FROM gene_viewer_metadata"
+  )
+  jsonlite::fromJSON(json$j)
 }
 
 

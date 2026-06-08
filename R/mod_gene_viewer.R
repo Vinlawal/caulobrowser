@@ -10,9 +10,9 @@
 mod_gene_viewer_ui <- function(id) {
   ns <- NS(id)
   tagList(
-    div(
-      h5("Gene Viewer"),
-      JBrowseR::JBrowseROutput(ns("browserOutput"))
+    bslib::card(
+      bslib::card_header("Gene Viewer"),
+      bslib::card_body(JBrowseR::JBrowseROutput(ns("browserOutput")))
     )
   )
 }
@@ -20,76 +20,52 @@ mod_gene_viewer_ui <- function(id) {
 #' gene_viewer Server Functions
 #'
 #' @noRd
-mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
+mod_gene_viewer_server <- function(
+  id,
+  location = shiny::reactive(NULL),
+  db_con
+) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    # create the necessary JB2 assembly configuration
-    assembly <- JBrowseR::assembly(
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/NC_011916.fasta.gz",
-      bgzip = TRUE
-    )
-
-    gff_index <- JBrowseR::text_index(
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/trix_output/trix/NC_011916.final.gff.gz.ix",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/trix_output/trix/NC_011916.final.gff.gz.ixx",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/trix_output/trix/NC_011916.final.gff.gz_meta.json",
-      "NC_011916"
-    )
-
-    # create configuration for a JB2 GFF FeatureTrack
-    annotations_track <- JBrowseR::track_feature(
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/NC_011916.final.gff.gz",
-      assembly
-    )
-
-    operon_track <- JBrowseR::track_feature(
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/operons.gff3.gz",
-      assembly
-    )
-
-    wiggle_s3_urls <- c(
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/CtrA_Artemis_from_GEO_JS.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/CtrA_deltapleC-ChIP_artemis.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/flbD-ChIP_artemis.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/gcrA_artemis.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/SciP_Artemis_from_GEO_JS.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/SciP_deltamucR12-ChIP_artemis.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/staR_artemis.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2296_Pxyl-gcrA_PYEX_AntiFlag_Control_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2297_Pxyl-gcrA-3xFLAG_PYEX_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2298_Pgcra-gcrA-3xFLAG_PYE_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2299_rpoC-3xFLAG_PYE_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2299_rpoC-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2300_sigma32-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_ML2301_sigma54-3xFLAG_PYE_Rifampicin_AntiFlag_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_WT_PYE_AntiRpoD_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/Chipseq_bigwig_files_fixed/Laublab_NA1000_WT_PYE_Rifampicin_AntiRpoD_ChIPSeq.bigWig",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/WT1_2_datafromolTnseqArchive/Chienlab_WT_PYE_minusstrand_TnSeq.bw",
-      "https://osdf-director.osg-htc.org/unity-hpc/caulobrowser/gene_viewer_files/WT1_2_datafromolTnseqArchive/Chienlab_WT_PYE_plusstrand_TnSeq.bw"
-    )
-
-    wiggle_tracks <- lapply(wiggle_s3_urls, \(x) {
-      JBrowseR::track_wiggle(
-        x,
-        assembly
-      )
-    })
-
-    # create the tracks array to pass to browser
-    tracks <- do.call(
-      JBrowseR::tracks,
-      c(list(annotations_track, operon_track), wiggle_tracks)
-    )
-
-    # set up the default session for the browser
-    default_session <- JBrowseR::default_session(
-      assembly,
-      c(annotations_track),
-      display_assembly = FALSE
-    )
 
     theme <- JBrowseR::theme("#5da8a3", "#333")
+
+    jb_config <- shiny::reactive({
+      con <- db_con()
+      shiny::req(con)
+
+      jbrowser_meta <- get_gene_viewer_metadata(con)
+      tracks_df <- jbrowser_meta$tracks
+
+      assembly <- JBrowseR::assembly(jbrowser_meta$assembly, bgzip = TRUE)
+      gff_index <- do.call(
+        JBrowseR::text_index,
+        as.list(jbrowser_meta$text_index)
+      )
+
+      annotations_tracks <- lapply(
+        subset(tracks_df, track_type == "feature")$https_paths,
+        \(path) JBrowseR::track_feature(path, assembly)
+      )
+      wiggle_tracks <- lapply(
+        subset(tracks_df, track_type == "wiggle")$https_paths,
+        \(path) JBrowseR::track_wiggle(path, assembly)
+      )
+
+      list(
+        assembly = assembly,
+        tracks = do.call(
+          JBrowseR::tracks,
+          c(annotations_tracks, wiggle_tracks)
+        ),
+        gff_index = gff_index,
+        default_session = JBrowseR::default_session(
+          assembly,
+          unlist(annotations_tracks),
+          display_assembly = FALSE
+        )
+      )
+    })
 
     effective_location <- shiny::reactive({
       loc <- location()
@@ -100,17 +76,17 @@ mod_gene_viewer_server <- function(id, location = shiny::reactive(NULL)) {
       }
     })
 
-    output$browserOutput <- JBrowseR::renderJBrowseR(
+    output$browserOutput <- JBrowseR::renderJBrowseR({
+      cfg <- jb_config()
       JBrowseR::JBrowseR(
         "View",
-        assembly = assembly,
-        # pass our tracks here
-        tracks = tracks,
-        text_index = gff_index,
+        assembly = cfg$assembly,
+        tracks = cfg$tracks,
+        text_index = cfg$gff_index,
         location = effective_location(),
-        defaultSession = default_session,
+        defaultSession = cfg$default_session,
         theme = theme
       )
-    )
+    })
   })
 }

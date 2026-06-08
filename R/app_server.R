@@ -52,7 +52,11 @@ app_server <- function(input, output, session) {
   shiny::outputOptions(output, "has_results", suspendWhenHidden = FALSE)
 
   # ── Module: Overview Table (Section 1) ────────────────────────
-  viewer_location <- mod_overview_table_server("overview_table", gene_results, db_con)
+  viewer_location <- mod_overview_table_server(
+    "overview_table",
+    gene_results,
+    db_con
+  )
 
   # ── Module: Expression Profiles (Section 2) ───────────────────
   mod_expression_server("expression", gene_results, db_con)
@@ -69,5 +73,5 @@ app_server <- function(input, output, session) {
   })
 
   # ── Module: Gene Viewer ----------------──────-----------------
-  mod_gene_viewer_server("gene_viewer", location = viewer_location)
+  mod_gene_viewer_server("gene_viewer", location = viewer_location, db_con)
 }
