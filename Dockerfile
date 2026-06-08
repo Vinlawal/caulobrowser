@@ -1,4 +1,5 @@
-FROM baldikacti/caulobrowser_base:latest
+ARG BASE_IMAGE=ghcr.io/baldikacti/caulobrowser-base:latest
+FROM $BASE_IMAGE
 COPY renv.lock renv.lock
 RUN R -e 'options(renv.config.pak.enabled = FALSE);renv::restore()'
 COPY ./deploy/caulobrowser_*.tar.gz /app.tar.gz

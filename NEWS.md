@@ -1,6 +1,11 @@
+# caulobrowser 0.3.0
+
+- Adds operon track to the genome viewer.
+- Docker image now includes the Pelican binary to support programmatic database download.
+
 # caulobrowser 0.2.3
 
-# caulobrowser 0.2.2
+- Switches genome viewer track data storage from AWS to OSN (Open Storage Network) pod.
 
 # caulobrowser 0.2.1
 
