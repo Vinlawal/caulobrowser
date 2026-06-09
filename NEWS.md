@@ -1,3 +1,9 @@
+# caulobrowser 0.4.0
+
+- Adds filter controls to the differential expression heatmap.
+- Adds GitHub Actions CI: automated Docker image publishing, R CMD check, and test coverage reporting on pull requests and pushes.
+- Expands test coverage across database query functions.
+
 # caulobrowser 0.3.0
 
 - Adds operon track to the genome viewer.
