@@ -333,16 +333,6 @@ plot_de_heatmap <- function(de_df, height_px = 300, scale_limit = 2) {
     )
   )
 
-  # Stable factor order: first-searched gene at top of Y-axis
-  de_df$gene_name <- factor(
-    de_df$gene_name,
-    levels = rev(unique(de_df$gene_name))
-  )
-  de_df$display_label <- factor(
-    de_df$display_label,
-    levels = unique(de_df$display_label)
-  )
-
   p <- ggplot2::ggplot(
     de_df,
     ggplot2::aes(x = gene_name, y = display_label, fill = log2fc)

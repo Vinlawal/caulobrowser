@@ -24,6 +24,41 @@ mod_de_heatmap_ui <- function(id) {
       "Blue\u00a0=\u00a0down-regulated, red\u00a0=\u00a0up-regulated relative to the reference."
     ),
     shiny::div(
+      class = "border rounded p-2 mb-3",
+      shiny::tags$small(
+        class = "text-uppercase text-muted fw-semibold d-block mb-2",
+        style = "font-size: 0.7em; letter-spacing: 0.05em;",
+        "Display filters"
+      ),
+      shiny::div(
+        class = "mb-2",
+        shiny::checkboxInput(
+          ns("filter_pheno"),
+          "Limit to top 10 experiments",
+          value = TRUE
+        ),
+        shiny::tags$small(
+          class = "text-muted d-block",
+          style = "margin-top: -8px; padding-left: 1.6em;",
+          "Ranks experiments by mean absolute log\u00b2FC across the selected genes",
+          "and keeps the top 10."
+        )
+      ),
+      shiny::div(
+        shiny::checkboxInput(
+          ns("filter_sig"),
+          "Significant results only",
+          value = FALSE
+        ),
+        shiny::tags$small(
+          class = "text-muted d-block",
+          style = "margin-top: -8px; padding-left: 1.6em;",
+          "Keeps experiments with adjusted p-value\u00a0<\u00a00.05 or\u00a0|t|\u00a0>\u00a04.",
+          "Experiments without these statistics are excluded."
+        )
+      )
+    ),
+    shiny::div(
       class = "row align-items-start",
       shiny::div(
         class = "col-12 col-lg-8",
@@ -44,12 +79,40 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
     de_data <- shiny::reactive({
       genes <- gene_results()
       shiny::req(nrow(genes) > 0)
+      top_n <- 10L
+      gene_levels <- genes$gene_name
 
-      get_de_results_for_heatmap(
-        db_con(),
-        gene_ids = genes$gene_id,
-        data_type = dtype_filter
-      )
+      if (input$filter_sig) {
+        de_res <- get_de_results_for_heatmap(
+          db_con(),
+          gene_ids = genes$gene_id,
+          data_type = dtype_filter
+        ) |>
+          subset(padj < 0.05)
+      } else {
+        de_res <- get_de_results_for_heatmap(
+          db_con(),
+          gene_ids = genes$gene_id,
+          data_type = dtype_filter
+        )
+      }
+
+      if (input$filter_pheno) {
+        top_exps <- unique(de_res[
+          order(abs(de_res$log2fc), decreasing = TRUE),
+          "experiment_id"
+        ])[1:top_n]
+        top_exps <- top_exps[!is.na(top_exps)]
+        de_res <- subset(de_res, experiment_id %in% top_exps)
+      }
+
+      label_order <- names(sort(
+        tapply(abs(de_res$log2fc), de_res$display_label, mean, na.rm = TRUE),
+        decreasing = FALSE
+      ))
+      de_res$display_label <- factor(de_res$display_label, levels = label_order)
+      de_res$gene_name <- factor(de_res$gene_name, levels = gene_levels)
+      return(de_res)
     })
 
     # ── Dynamic height: 40 px per experiment row in the tallest facet ────────
@@ -101,7 +164,7 @@ mod_de_heatmap_server <- function(id, gene_results, dtype_filter, db_con) {
           shiny::tags$table(
             class = "table table-sm table-borderless mb-0",
             shiny::tags$tbody(
-              make_row("Experiment:", na_or(row$display_label)),
+              make_row("Experiment:", na_or(as.character(row$display_label))),
               make_row("Data type:", na_or(row$data_type)),
               make_row("Strain:", na_or(row$strain)),
               make_row("Genetic Background:", na_or(row$genetic_background)),

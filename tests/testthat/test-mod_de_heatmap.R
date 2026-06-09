@@ -23,6 +23,7 @@ testServer(
     db_con = shiny::reactiveVal(generate_example_database(":memory:"))
   ),
   {
+    session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     df <- de_data()
     expect_s3_class(df, "data.frame")
     for (col in c("gene_id", "log2fc", "experiment_id", "display_label", "data_type")) {
@@ -43,6 +44,7 @@ testServer(
     db_con = shiny::reactiveVal(generate_example_database(":memory:"))
   ),
   {
+    session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     df <- de_data()
     expect_true(all(df$data_type == "rnaseq"))
   }
@@ -59,6 +61,7 @@ testServer(
     db_con = shiny::reactiveVal(generate_example_database(":memory:"))
   ),
   {
+    session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     df <- de_data()
     expect_equal(nrow(df), 0)
   }
@@ -75,6 +78,7 @@ testServer(
     db_con = shiny::reactiveVal(generate_example_database(":memory:"))
   ),
   {
+    session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     expect_error(de_data())
   }
 )
@@ -90,6 +94,7 @@ testServer(
     db_con = shiny::reactiveVal(generate_example_database(":memory:"))
   ),
   {
+    session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     expect_gte(plot_height_px(), 200)
   }
 )
@@ -105,6 +110,7 @@ testServer(
     db_con = shiny::reactiveVal(generate_example_database(":memory:"))
   ),
   {
+    session$setInputs(filter_sig = FALSE, filter_pheno = TRUE)
     expect_equal(plot_height_px(), 200L)
   }
 )

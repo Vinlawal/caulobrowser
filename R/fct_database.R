@@ -98,12 +98,22 @@ search_genes <- function(con, query) {
    FROM genes
    WHERE LOWER(gene_name) IN ({placeholders})
       OR LOWER(cc_tag)    IN ({placeholders})
-      OR LOWER(gene_id)   IN ({placeholders})
-   ORDER BY gene_name"
+      OR LOWER(gene_id)   IN ({placeholders})"
   )
 
   # Same terms bound three times (one per IN clause)
-  DBI::dbGetQuery(con, sql, params = rep(terms, 3))
+  result <- DBI::dbGetQuery(con, sql, params = rep(terms, 3))
+
+  if (nrow(result) == 0) return(result)
+
+  # Preserve input order: find the earliest matching term position per row
+  pos <- pmin(
+    match(tolower(result$gene_name), terms),
+    match(tolower(result$cc_tag),    terms),
+    match(tolower(result$gene_id),   terms),
+    na.rm = TRUE
+  )
+  result[order(pos), ]
 }
 
 
